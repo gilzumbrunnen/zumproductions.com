@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none" role="img" aria-label="Websites">
+  <!-- Browser window -->
+  <rect x="16" y="28" width="96" height="72" rx="8" stroke="#0B1F2A" stroke-width="8"/>
+  <line x1="16" y1="48" x2="112" y2="48" stroke="#0B1F2A" stroke-width="8"/>
+  <circle cx="32" cy="38" r="3.5" fill="#0D9B8A"/>
+  <circle cx="44" cy="38" r="3.5" fill="#0D9B8A"/>
+  <circle cx="56" cy="38" r="3.5" fill="#0D9B8A"/>
+  <!-- Layout blocks -->
+  <rect x="28" y="60" width="36" height="28" rx="4" fill="#0D9B8A" opacity="0.9"/>
+  <rect x="72" y="60" width="28" height="12" rx="3" fill="#0B1F2A" opacity="0.25"/>
+  <rect x="72" y="78" width="28" height="10" rx="3" fill="#0B1F2A" opacity="0.15"/>
+</svg>
