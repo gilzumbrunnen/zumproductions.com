@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.2] - 2026-10-25
+
+### Changed
+
+- Hero lede, eyebrow (Swiss digital studio), service blurbs, and contact heading.
+- Primary contact button is "Send a short brief". Hero button stays "Talk to us".
+- Public contact address is hello@zumproductions.com. privacy@ stays on the privacy notice and the terms questions line.
+- Trust line under the hero actions. Newsletter line removed from the footer.
+- Privacy and terms pages use short notice language. Meta descriptions match the new lede.
+
 ## [0.1.1] - 2026-10-25
 
 ### Changed

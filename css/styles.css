@@ -261,6 +261,13 @@ a:hover {
   color: var(--text-sec);
 }
 
+.trust {
+  max-width: 36rem;
+  margin: 1.35rem 0 0;
+  color: var(--text-sec);
+  font-size: 0.9375rem;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -354,7 +361,7 @@ a:hover {
 }
 
 .contact h2 {
-  max-width: 16em;
+  max-width: 12.5em;
 }
 
 .site-footer {
@@ -415,7 +422,6 @@ a:hover {
   text-underline-offset: 0.2em;
 }
 
-.footer-note,
 .footer-meta {
   margin: 0.4rem 0 0;
   color: var(--muted);
