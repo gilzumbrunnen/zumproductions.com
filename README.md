@@ -19,8 +19,8 @@ Then open [http://localhost:8000/](http://localhost:8000/).
 | Path | What it is |
 |------|------------|
 | `index.html` | Home: nav, hero, three services, contact |
-| `privacy.html` | Privacy placeholder |
-| `terms.html` | Terms of use placeholder |
+| `privacy.html` | Short privacy notice |
+| `terms.html` | Short terms notice |
 | `css/styles.css` | Layout and the Painter palette |
 | `js/nav.js` | Mobile menu only |
 | `assets/` | Logo mark, wordmark, service icons, favicon, OG image, self-hosted Inter |
@@ -29,4 +29,4 @@ Then open [http://localhost:8000/](http://localhost:8000/).
 
 Ink `#0B1F2A`, purple `#6D28D9` (hover `#5B21B6`), background `#F8F6F3`. `#8B5CF6` is decorative only. Inter is self-hosted in `assets/fonts/` so the page does not call Google Fonts. The stack falls back to system UI fonts if the file does not load.
 
-Contact is `privacy@zumproductions.com`. There is no newsletter backend — the footer says coming soon.
+Public contact is `hello@zumproductions.com`. `privacy@zumproductions.com` stays on the privacy notice and the terms questions line.
