@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1] - 2026-10-25
+
+### Changed
+
+- Accent is purple `#6D28D9`, with hover `#5B21B6`. Soft `#8B5CF6` is decorative only (nav line, eyebrow).
+- Logo, service icons, favicon, and Open Graph image replaced with the purple pack.
+
 ## [0.1.0] - 2026-10-25
 
 ### Added

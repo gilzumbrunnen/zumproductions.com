@@ -27,6 +27,6 @@ Then open [http://localhost:8000/](http://localhost:8000/).
 
 ## Design
 
-Ink `#0B1F2A`, teal `#0D9B8A` / `#14B8A6`, background `#F8F6F3`. Inter is self-hosted in `assets/fonts/` so the page does not call Google Fonts. The stack falls back to system UI fonts if the file does not load.
+Ink `#0B1F2A`, purple `#6D28D9` (hover `#5B21B6`), background `#F8F6F3`. `#8B5CF6` is decorative only. Inter is self-hosted in `assets/fonts/` so the page does not call Google Fonts. The stack falls back to system UI fonts if the file does not load.
 
 Contact is `privacy@zumproductions.com`. There is no newsletter backend — the footer says coming soon.

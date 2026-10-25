@@ -9,8 +9,9 @@
 
 :root {
   --ink: #0B1F2A;
-  --teal: #0D9B8A;
-  --teal-light: #14B8A6;
+  --purple: #6D28D9;
+  --purple-hover: #5B21B6;
+  --purple-soft: #8B5CF6;
   --bg: #F8F6F3;
   --surface: #FFFFFF;
   --border: #E5E2DC;
@@ -85,7 +86,7 @@ a {
 }
 
 a:hover {
-  color: var(--teal);
+  color: var(--purple);
 }
 
 :focus {
@@ -93,12 +94,12 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--purple);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: var(--teal);
+  background: var(--purple);
   color: var(--white);
 }
 
@@ -157,7 +158,7 @@ a:hover {
   right: 0;
   bottom: -1px;
   height: 2px;
-  background: var(--teal);
+  background: var(--purple-soft);
 }
 
 .bar {
@@ -228,7 +229,7 @@ a:hover {
 }
 
 .site-nav a:hover {
-  color: var(--teal);
+  color: var(--purple);
 }
 
 .hero {
@@ -250,7 +251,7 @@ a:hover {
 .eyebrow-mark {
   width: 1.4rem;
   height: 2px;
-  background: var(--teal);
+  background: var(--purple-soft);
   flex: none;
 }
 
@@ -283,14 +284,14 @@ a:hover {
 }
 
 .btn-primary {
-  background: var(--teal);
-  border-color: var(--teal);
+  background: var(--purple);
+  border-color: var(--purple);
   color: var(--white);
 }
 
 .btn-primary:hover {
-  background: var(--teal-light);
-  border-color: var(--teal-light);
+  background: var(--purple-hover);
+  border-color: var(--purple-hover);
   color: var(--white);
 }
 
@@ -301,8 +302,8 @@ a:hover {
 }
 
 .btn-ghost:hover {
-  border-color: var(--teal);
-  color: var(--teal);
+  border-color: var(--purple);
+  color: var(--purple);
 }
 
 .link {
@@ -329,7 +330,7 @@ a:hover {
 }
 
 .card:hover {
-  border-color: color-mix(in srgb, var(--teal) 40%, transparent);
+  border-color: color-mix(in srgb, var(--purple) 40%, transparent);
   box-shadow: 0 8px 24px rgba(11, 31, 42, 0.08);
   transform: translateY(-2px);
 }
@@ -382,7 +383,10 @@ a:hover {
 }
 
 .footer-brand:hover {
-  color: var(--teal-light);
+  color: var(--white);
+  text-decoration: underline;
+  text-decoration-color: var(--purple-soft);
+  text-underline-offset: 0.2em;
 }
 
 .footer-brand img {
@@ -405,7 +409,10 @@ a:hover {
 }
 
 .site-footer a:hover {
-  color: var(--teal-light);
+  color: var(--white);
+  text-decoration: underline;
+  text-decoration-color: var(--purple-soft);
+  text-underline-offset: 0.2em;
 }
 
 .footer-note,
@@ -427,7 +434,8 @@ a:hover {
 }
 
 .footer-meta a:hover {
-  color: var(--teal-light);
+  color: var(--white);
+  text-decoration-color: var(--purple-soft);
 }
 
 .subpage {
