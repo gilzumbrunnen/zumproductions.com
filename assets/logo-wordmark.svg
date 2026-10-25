@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" width="720" height="160" role="img" aria-label="Zum Productions">
+  <!-- Mark -->
+  <g transform="translate(0,16)">
+    <rect width="128" height="128" rx="22" fill="#0B1F2A"/>
+    <g fill="#6D28D9" transform="translate(0,0) scale(0.25)">
+      <rect x="118" y="128" width="276" height="56" rx="8"/>
+      <rect x="118" y="328" width="276" height="56" rx="8"/>
+      <polygon points="394,184 214,328 118,328 298,184"/>
+    </g>
+  </g>
+  <!-- Wordmark text as paths-ish via text (system will render; also fine as text for implementers) -->
+  <text x="152" y="72" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif"
+        font-size="42" font-weight="700" fill="#0B1F2A" letter-spacing="-0.02em">Zum Productions</text>
+  <text x="152" y="112" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif"
+        font-size="16" font-weight="500" fill="#5C6B73" letter-spacing="0.08em">DIGITAL AGENCY &amp; IT SERVICES</text>
+</svg>
