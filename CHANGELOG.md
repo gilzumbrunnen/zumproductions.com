@@ -10,7 +10,7 @@
 - The effective date on the games privacy policy is still `[DD Month YYYY]`, marked on the page. Set it on the day the policy is approved for publishing.
 - Support on each game page is games@zumproductions.com. The privacy contact on the games policy stays privacy@zumproductions.com.
 - Screenshots are still missing for Callout Cadence, Summit Rescue, Funicular Fix, and Fondue Frenzy.
-- Games hero art is in `assets/games/hero/` under stable names (`games_hero_1600x600` and `games_hero_3200x1200`, WebP and PNG).
+- Games hero art is in `assets/games/hero/` under stable names (`games_hero_1600x600` and `games_hero_3200x1200`, AVIF, WebP and PNG).
 - Hero repaint: the Fromage Dash mouse now wears goggles and a scarf. Same filenames and dimensions. AVIF and the PNG fallbacks were regenerated with the same settings.
 - Fromage Dash icon, feature graphic, and screenshots use the same reskin (goggles, red scarf, dusk background). Derivatives were regenerated with the same pipeline.
 - This repo has no Content-Security-Policy file. The games pages add no third-party scripts, fonts, or trackers.
@@ -25,15 +25,13 @@ Do not merge this until the section is meant to go live.
 
 ### Deploy notes / launch blockers
 
-- (a) Deploys are manual SFTP or file-manager uploads. `.htaccess` here is a merge template, never a file to upload. Merge it into the live file. Do not replace it. Do not upload README, CHANGELOG, `scripts/`, `.git/`, or dotfiles. The public tree is only `index.html`, `privacy.html`, `terms.html`, `css/`, `js/`, `assets/`, and `games/`. Or: `git archive --format=zip -o /tmp/zumproductions-deploy.zip HEAD index.html privacy.html terms.html css js assets games`. `.gitattributes` marks `.gitkeep` as `export-ignore`, so that zip has no dotfiles.
-- (b) At launch, remove the live `/` to `/en/` rule. It hides the new `index.html`.
-- (c) This repo has no `robots.txt`. The live one is not in git and has `Disallow: /assets/`, which blocks the new images, fonts, and OG image. At launch, replace the live file with a `robots.txt` that does not disallow `/assets/`, or add one to the repo then.
-- (d) Consider `ErrorDocument 404 /404/index.html` and a real 404 page for a proper 404 status. Documented only. The page is not built.
-- (e) At launch, remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date.
-- (f) Merging PR #3 makes Games public through the nav and the homepage teaser, so merge only on Gil's explicit go.
-- (g) Devops must confirm the document root and merge `.htaccess` into the live file.
+- **Never use mirror, sync, or "delete missing files" in the SFTP client.** That would wipe `/en/` and `/404/` and take the live site down.
+- Pre-launch upload is only `games/`, `assets/games/`, `css/`, and `js/`. `index.html`, `privacy.html`, and `terms.html` wait until launch, because they show the Games nav and teaser and are not `noindex`. `robots.txt` in this repo is launch-only (allow all, no `/assets/` disallow, no `Sitemap:` line because there is no sitemap).
+- The ordered upload, the two archive commands, what the games pages still request from the rest of `assets/`, and the rollback steps are in the README. `css/` and `js/` do not restyle the 2021 pages.
+- (d) `ErrorDocument 404` does nothing until the live catch-all that 301s to `/404/` is replaced. The new 404 page is not built. It must use root-absolute paths.
+- (e) Removing the games `noindex` meta tags is a new commit and a re-upload of the eight games HTML files.
 - (h) Set the `privacy.html` effective date at publish. The games@ mailbox must exist before merge (or switch the games pages and the games policy to privacy@).
-- After that merge, `curl -I` `/` (still 301s to `/en/` until blocker (b) is done), `/privacy.html` (must not carry `X-Robots-Tag`), `/games/`, `/games/privacy` (expect 301 to the trailing slash), `/games/privacy/` (expect 200 plus `X-Robots-Tag` until launch), and one asset under `/assets/games/` (should carry `X-Robots-Tag: noindex` until launch). None of these should return 500.
+- Checks: `scripts/post-merge-curl.sh`. That file is `export-ignore` and is not part of the upload. The plain-`http` check has to be run from another network.
 
 
 ## [0.1.2] - 2026-10-25

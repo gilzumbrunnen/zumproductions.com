@@ -7,27 +7,31 @@
 # would lose to the live !-f/!-d catch-all that 301s to /404/. The privacy
 # redirect below is a RewriteRule and must sit before that catch-all.
 
-# [ADD ONLY IF ALLOWED] the live site already has -Indexes. If the host disallows Options overrides this 500s the whole site.
+# # # [ADD ONLY IF ALLOWED] the live site already has -Indexes. If the host disallows Options overrides this 500s the whole site.
 # Options -Indexes
 DirectoryIndex index.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # [KEEP LIVE VERSION] HTTPS and www -> apex. Observed: www 301s to the apex with the path kept.
-  # If live does this in the Infomaniak panel rather than here, do not add these lines.
+  # # # [KEEP LIVE VERSION] HTTPS and www -> apex. Observed: www 301s to the apex with the path kept.
+  # # # If live does this in the Infomaniak panel rather than here, do not add these lines.
   # RewriteCond %{HTTP_HOST} ^www\.zumproductions\.com$ [NC]
   # RewriteRule ^ https://zumproductions.com%{REQUEST_URI} [R=301,L]
 
-  # NEW (PR #3): exact path only, absolute https target. Must come before the 404 catch-all.
-  # A relative target would take the request scheme and host, which can be http behind a TLS proxy.
+  # # # NEW (PR #3): exact path only, absolute https target. Must come before the 404 catch-all.
+  # # # A relative target would take the request scheme and host, which can be http behind a TLS proxy.
   RewriteRule ^games/privacy$ https://zumproductions.com/games/privacy/ [R=301,L]
 
-  # [LIVE, old Gatsby site] "/" -> "/en/" (query kept). DELETE AT LAUNCH.
+  # # # [LIVE, old Gatsby site] "/" -> "/en/" (query kept). DELETE AT LAUNCH.
   # RewriteRule ^$ /en/ [R=301,L]
 
-  # [KEEP LIVE VERSION] Catch-all. Observed: 301 to /404/ for missing files and dirs only.
-  # Inferred shape. Keep the real live rule, and keep it after the privacy redirect.
+  # # # [LAUNCH ONLY, do not enable yet] After / no longer redirects to /en/, send the old Gatsby URLs home.
+  # # # Must sit before the 404 catch-all. Do not turn this on while ^$ still goes to /en/.
+  # RewriteRule ^en(/.*)?$ https://zumproductions.com/ [R=301,L]
+
+  # # # [KEEP LIVE VERSION] Catch-all. Observed: 301 to /404/ for missing files and dirs only.
+  # # # Inferred shape. Keep the real live rule, and keep it after the privacy redirect.
   # RewriteCond %{REQUEST_FILENAME} !-f
   # RewriteCond %{REQUEST_FILENAME} !-d
   # RewriteRule ^ /404/ [R=301,L]
@@ -42,8 +46,13 @@ DirectoryIndex index.html
   </IfModule>
 </IfModule>
 
-# [KEEP LIVE VERSION] Anything else in the live file: HSTS (max-age=16000000) if set here,
-# rules that deny .git/.env, AddType/Expires, password protection, and so on.
+# # # [KEEP LIVE VERSION] Anything else in the live file: HSTS (max-age=16000000) if set here,
+# # # rules that deny .git/.env, AddType/Expires, password protection, and so on.
+
+# # # [OPTIONAL, not active] The live host sends no Cache-Control. Unversioned css and js can stay cached after a later edit.
+# # <FilesMatch "\.(html|css|js)$">
+# #   Header set Cache-Control "no-cache"
+# # </FilesMatch>
 
 # [LAUNCH HARDENING: Devops applies one line at a time, after merging with the live file]
 # Nothing in this block is active. Options and ServerSignature can 500 the site if the
@@ -53,13 +62,13 @@ DirectoryIndex index.html
 # for the inline script document.documentElement.classList.add("js"); redo the hash if that
 # snippet changes by even one byte.
 #
-# # ===== Security additions (proposed, review 2026-10-29) =====
-# # Merge into the live docroot .htaccess. Do not upload over it.
+# # # ===== Security additions (proposed, review 2026-10-29) =====
+# # # Merge into the live docroot .htaccess. Do not upload over it.
 # #
-# # Directory listings: the live site reportedly already has this. Add only if Options overrides are allowed (otherwise 500).
+# # # Directory listings: the live site reportedly already has this. Add only if Options overrides are allowed (otherwise 500).
 # # Options -Indexes
 # #
-# # Allowed in .htaccess with AllowOverride All. Remove if it causes a 500.
+# # # Allowed in .htaccess with AllowOverride All. Remove if it causes a 500.
 # # ServerSignature Off
 # #
 # # <IfModule mod_rewrite.c>
@@ -122,4 +131,4 @@ DirectoryIndex index.html
 # #   # Optional: see what a strict policy would break on the Gatsby pages (console only, nothing blocked).
 # #   # Header always set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
 # # </IfModule>
-# # ===== end security additions =====
+# # # ===== end security additions =====

@@ -70,33 +70,59 @@ Public contact is `hello@zumproductions.com`. `privacy@zumproductions.com` stays
 
 ## Deploy notes / launch blockers
 
-(a) Deploys are manual SFTP or file-manager uploads. `.htaccess` here is a merge template, never a file to upload. Merge it into the live file. Do not replace the live file. Do not upload README, CHANGELOG, `scripts/`, `.git/`, or dotfiles. The public tree is only `index.html`, `privacy.html`, `terms.html`, `css/`, `js/`, `assets/`, and `games/`. Or build a bundle that cannot include `.git` or dotfiles:
+Gil uploads. Devops does not have the SFTP or Manager login. `.htaccess` in this repo is a merge template, never a file to upload.
+
+**Never use mirror, sync, or "delete missing files" in the SFTP client.** That includes FileZilla synchronized browsing, a directory comparison that deletes, `rsync --delete`, and `lftp mirror -R --delete`. Any of those would wipe `/en/` and `/404/` and take the live site down. Upload only. Do not delete anything in the live docroot before launch.
+
+### Manual upload
+
+1. Gil downloads a full backup of the live site to his own disk, `.htaccess` and `robots.txt` included, plus `/en/`, `/404/`, `/404.html`, `/static/`, `/page-data/`, and `favicon.ico`. He also notes the date of the latest automatic backup in Infomaniak Manager. Keep that copy off the server. Do not leave `.htaccess.bak` or a zip in the docroot.
+2. He uploads the new files. Files are mode 644, folders are mode 755. Never 777. Transfer binary (or Auto with no line-ending rewrite). `.htaccess`, once edited, stays 644.
+3. He edits the live `.htaccess` in place, as the last upload step. Merge the template line by line. Do not replace the live file.
+4. Then he runs `scripts/post-merge-curl.sh`. The expected results are in that script. The plain-`http` check has to be run from another network.
+
+### What to upload, in two phases
+
+**Pre-launch:** `games/`, `assets/games/`, `css/`, and `js/` only.
 
 ```bash
-git archive --format=zip -o /tmp/zumproductions-deploy.zip HEAD index.html privacy.html terms.html css js assets games
+git archive --format=zip -o /tmp/zumproductions-prelaunch.zip HEAD css js games assets/games
 ```
 
-`.gitattributes` marks `.gitkeep` as `export-ignore`, so that zip has no dotfiles.
+**Launch only:** `index.html`, `privacy.html`, `terms.html`, the rest of `assets/` (logos, favicon, font, OG image), and `robots.txt`. `robots.txt` in this repo is launch-only: it allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line.
 
-(b) At launch, remove the live `/` to `/en/` rule. It hides the new `index.html`.
+```bash
+git archive --format=zip -o /tmp/zumproductions-launch.zip HEAD index.html privacy.html terms.html assets robots.txt
+```
 
-(c) This repo has no `robots.txt`. The live one is not in git and has `Disallow: /assets/`, which blocks the new images, fonts, and OG image. At launch, replace the live file with a `robots.txt` that does not disallow `/assets/`, or add one to the repo then.
+Do not upload README, CHANGELOG, `scripts/`, `.git/`, or other dotfiles. `scripts/` and `.gitkeep` are `export-ignore` in `.gitattributes`, so these zips contain no dotfiles. Run the archive on `main` after the merge and record the SHA.
 
-(d) Consider `ErrorDocument 404 /404/index.html` and a real 404 page so missing URLs return 404. Not built yet.
+The new `css/styles.css` and `js/nav.js` are not referenced by the 2021 pages, and those paths do not exist on the live site today. Uploading them does not change how the 2021 pages look.
 
-(e) At launch, remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date.
+Games pages also ask for files that are not in the pre-launch set: `assets/favicon.png`, `assets/logo-wordmark.svg`, `assets/logo-mark.svg`, `assets/logo-mark.png`, `assets/fonts/inter-latin.woff2` (from the CSS), and, on `/games/` and `/games/privacy/`, `assets/og-image.png`. Until the launch upload, those requests miss and the catch-all sends them to `/404/`. The pages still load; the logo and the self-hosted font do not, and the browser falls back to a system font. Links to `/` still land on the 2021 site, which is fine while `/` redirects to `/en/`. Links to `privacy.html` and `terms.html` also miss until launch and follow the catch-all to `/404/`.
 
-(f) Merging PR #3 makes Games public through the nav and the homepage teaser, so merge only on Gil's explicit go.
+### Rollback
 
-(g) Devops must confirm the document root and merge `.htaccess` into the live file.
+1. Re-upload the saved live `.htaccess` first. That is the only file that changes how existing URLs behave, and it is enough if the new folders are still hidden behind `/en/`.
+2. If that is not enough, remove the new folders and pages (`games/`, `assets/games/` or `assets/`, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, `terms.html`, `robots.txt`).
+3. Last resort: restore from Infomaniak's automatic backups (Manager, Backups). Check the retention shown there before relying on it.
+
+### Launch-day checklist
+
+Do not do these until Gil says the section goes live.
+
+(b) Remove the live `/` to `/en/` rule. It hides the new `index.html`. The commented `^en(/.*)?$` rule in `.htaccess` can then 301 `/en/` and `/en/*` to `/`. Do not enable that rule while `/` still redirects to `/en/`.
+
+(c) Upload this repo's `robots.txt` over the live one. The live file disallows `/assets/`, which blocks the new images, fonts, and OG image.
+
+(d) `ErrorDocument 404` does nothing until the live soft-404 catch-all (the `!-f`/`!-d` rule that 301s to `/404/`) is replaced. The new 404 page is not built yet. When it is, it must use root-absolute paths (`/css/styles.css`, `/assets/...`), because it will be served for any missing URL.
+
+(e) Remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date. Removing the meta tags is a new commit, then re-upload the eight games HTML files. Run the curl script again and expect no `X-Robots-Tag`.
+
+(f) Merging PR #3 makes Games public through the nav and the homepage teaser on GitHub. On the live server that only happens when `index.html` is uploaded and `/` stops redirecting to `/en/`. Merge only on Gil's explicit go.
+
+(g) Devops must confirm the document root (Infomaniak Manager, Hosting, Sites) before Gil merges `.htaccess` into the live file. Gil does the upload.
 
 (h) Set the `privacy.html` effective date at publish. The games@ mailbox must exist before merge (or switch the games pages and the games policy to privacy@).
 
-After that merge, `curl -I` these URLs. None of them should return 500:
-
-- `https://zumproductions.com/` (still 301s to `/en/` until blocker (b) is done)
-- `https://zumproductions.com/privacy.html` (must not carry `X-Robots-Tag`)
-- `https://zumproductions.com/games/`
-- `https://zumproductions.com/games/privacy` (expect 301 to the trailing slash)
-- `https://zumproductions.com/games/privacy/` (expect 200, plus `X-Robots-Tag` until launch)
-- one asset under `https://zumproductions.com/assets/games/` (should carry `X-Robots-Tag: noindex` until launch)
+After the new 404 works, and only then, remove the Gatsby leftovers: `/en/`, `/404/`, `/404.html`, `/static/`, `/page-data/`, and the root Gatsby bundles. `/404/` loads files from `/static/`, so deleting `/static/` first breaks the old 404. Replace `/favicon.ico` in the same pass. There is no service worker, so no kill-switch file is needed.
