@@ -89,10 +89,10 @@ Gil uploads. Devops does not have the SFTP or Manager login. `.htaccess` in this
 git archive --format=zip -o /tmp/zumproductions-prelaunch.zip HEAD css js games assets/games assets/favicon.png assets/logo-mark.png assets/logo-mark.svg assets/logo-wordmark.svg assets/fonts assets/og-image.png
 ```
 
-**Launch only:** `index.html`, `privacy.html`, `terms.html`, `404.html`, `favicon.ico`, the rest of `assets/`, and `robots.txt`. `robots.txt` allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line. `favicon.ico` is a 16, 32 and 48 pixel file made from `assets/favicon.png`, for the launch swap of the old icon. `404.html` is not wired up until the catch-all is replaced.
+**Launch only:** `index.html`, `privacy.html`, `terms.html`, `404.html`, `favicon.ico`, `css/`, `js/`, the rest of `assets/`, and `robots.txt`. `404.html` loads `/css/styles.css` and `/js/nav.js`, so those two directories are in this zip as well. The launch upload is self-contained, and it expects the pre-launch upload to be done already. `robots.txt` allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line. `favicon.ico` is a 16, 32 and 48 pixel file made from `assets/favicon.png`, for the launch swap of the old icon. `404.html` is not wired up until the catch-all is replaced.
 
 ```bash
-git archive --format=zip -o /tmp/zumproductions-launch.zip HEAD index.html privacy.html terms.html 404.html favicon.ico assets robots.txt
+git archive --format=zip -o /tmp/zumproductions-launch.zip HEAD index.html privacy.html terms.html 404.html favicon.ico css js assets robots.txt
 ```
 
 Do not upload README, CHANGELOG, `scripts/`, `.git/`, or other dotfiles. `scripts/` and `.gitkeep` are `export-ignore` in `.gitattributes`, so these zips contain no dotfiles. Run the archive on `main` after the merge and record the SHA.
