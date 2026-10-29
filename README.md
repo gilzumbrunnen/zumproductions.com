@@ -29,7 +29,7 @@ Then open [http://localhost:8000/](http://localhost:8000/).
 | `assets/` | Logo, service icons, favicon, OG image, self-hosted Inter |
 | `assets/games/<slug>/` | Icon, feature graphic, optional title logo, screenshots |
 
-The games pages are not published. They send `noindex`. On the local static server, `/games/privacy` without a trailing slash redirects to `/games/privacy/`. Typical static hosts do the same when `games/privacy/index.html` exists.
+The games pages are not published. They send `noindex`. The live host is Apache and currently sends unknown paths such as `/games/privacy` to `/404/`. `.htaccess` at the repo root redirects that exact path to `/games/privacy/` and sets `X-Robots-Tag: noindex` on `/games/` and `/assets/games/`. Devops needs to confirm that file is the document root config, and that the redirect runs before the existing 404 rule. Remove the noindex header at launch. Python's static server still adds the slash on its own.
 
 ## Games art
 
@@ -48,7 +48,7 @@ python3 scripts/optimize-games-art.py
 
 Needs Pillow, `cwebp`, `avifenc`, and `pngquant`. Screenshots for Callout Cadence, Summit Rescue, Funicular Fix, and Fondue Frenzy are not in yet. Drop PNGs in that game's `shots/` folder and rerun the same script.
 
-The games hero files live in `assets/games/hero/` and keep these names: `games_hero_1600x600.webp`, `games_hero_1600x600.png`, `games_hero_3200x1200.webp`, `games_hero_3200x1200.png`. The page uses WebP first, then PNG, with a 1x/2x srcset. Replace the files in place if the art is repainted.
+The games hero files live in `assets/games/hero/` and keep these names: `games_hero_1600x600` and `games_hero_3200x1200`, each as AVIF, WebP, and PNG. The page offers them with width descriptors and `sizes="100vw"`. Replace the files in place if the art is repainted.
 
 ## Games privacy policy
 

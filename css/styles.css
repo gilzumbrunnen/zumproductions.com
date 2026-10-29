@@ -422,6 +422,10 @@ a:hover {
   text-underline-offset: 0.2em;
 }
 
+.site-footer a:focus-visible {
+  outline-color: #C4B5FD;
+}
+
 .footer-meta {
   margin: 0.4rem 0 0;
   color: var(--muted);
@@ -596,7 +600,7 @@ a:hover {
   z-index: 1;
   padding: 0.7rem 1rem 0.85rem;
   border-radius: 12px;
-  background: rgba(11, 31, 42, 0.55);
+  background: rgba(11, 31, 42, 0.72);
   color: #F8F6F3;
 }
 
@@ -665,11 +669,20 @@ a:hover {
   outline-offset: 3px;
 }
 
+.game-icon {
+  flex: none;
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+}
+
 .game-icon img,
 .game-heading img {
   display: block;
   width: 72px;
   height: 72px;
+  max-width: none;
+  flex-shrink: 0;
   border-radius: 16px;
   background: var(--ink);
 }
@@ -732,11 +745,13 @@ a.game-card:hover .status-pill {
 
 .feature {
   margin: 0 0 1.75rem;
+  max-width: 1024px;
 }
 
 .feature img {
   display: block;
   width: 100%;
+  max-width: 1024px;
   height: auto;
   border-radius: 14px;
   background: var(--surface);
@@ -933,6 +948,6 @@ a.game-card:hover .status-pill {
     top: 1rem;
     width: auto;
     max-width: 22rem;
-    background: rgba(11, 31, 42, 0.62);
+    background: rgba(11, 31, 42, 0.78);
   }
 }

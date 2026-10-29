@@ -1,0 +1,18 @@
+# Host config for the static site. This repo did not previously contain
+# Apache config. The live site is Apache and currently 301s unknown paths
+# such as /games/privacy to /404/. Devops: if production already has its
+# own .htaccess, merge these rules into that file. Do not let this file
+# replace a config that holds the rest of the site. The redirect below
+# has to run before that 404 catch-all.
+
+# Exact URL only. /games/privacy/ is the page the games link to.
+RedirectMatch 301 ^/games/privacy$ /games/privacy/
+
+# Unpublished games section. Remove this block at launch.
+<IfModule mod_headers.c>
+  <IfModule mod_setenvif.c>
+    SetEnvIf Request_URI "^/games(/|$)" zum_games_unpublished
+    SetEnvIf Request_URI "^/assets/games(/|$)" zum_games_unpublished
+    Header set X-Robots-Tag "noindex" env=zum_games_unpublished
+  </IfModule>
+</IfModule>

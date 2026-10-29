@@ -11,7 +11,13 @@
 - Support on each game page is games@zumproductions.com. The privacy contact on the games policy stays privacy@zumproductions.com.
 - Screenshots are still missing for Callout Cadence, Summit Rescue, Funicular Fix, and Fondue Frenzy.
 - Games hero art is in `assets/games/hero/` under stable names (`games_hero_1600x600` and `games_hero_3200x1200`, WebP and PNG).
-- This repo has no Content-Security-Policy or other security-header file. The games pages add no third-party scripts, fonts, or trackers.
+- This repo has no Content-Security-Policy file. The games pages add no third-party scripts, fonts, or trackers.
+- `.htaccess` redirects `/games/privacy` to `/games/privacy/` and sends `X-Robots-Tag: noindex` for `/games/` and `/assets/games/`. Devops: merge this into the live Apache config ahead of the `/404/` catch-all. Remove the noindex header at launch.
+- Game icons keep a fixed 72px box so they do not squash on a narrow screen.
+- Portrait screenshot `sizes` follow the single column on small screens. Feature graphics stop at their native 1024px.
+- Hero art adds AVIF and uses width descriptors. PNG fallbacks are compressed. Screenshot enlargements open the WebP.
+- Hero text sits on a darker scrim. Footer focus rings use `#C4B5FD`.
+- Game privacy links are absolute: `https://zumproductions.com/games/privacy/#slug`.
 
 Do not merge this until the section is meant to go live.
 
