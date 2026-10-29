@@ -26,6 +26,8 @@
 #   /games                     301 to /games/   (not 200)
 #   /games/                    200, X-Robots-Tag: noindex, HSTS present
 #   /games/privacy             301 to https://zumproductions.com/games/privacy/
+#   /games/privacy?x=1         301 to https://zumproductions.com/games/privacy/?x=1
+#                              (the query string is kept)
 #   /games/privacy/            200, X-Robots-Tag: noindex
 #   each /games/<slug>/        200, X-Robots-Tag: noindex
 #   /games/fromage-dash        301 to the trailing slash, not to /404/
@@ -52,7 +54,8 @@
 #   /en/ and /en/foo           301 to https://zumproductions.com/
 #   /index.html /privacy.html /terms.html
 #                              200, no X-Robots-Tag
-#   /games and /games/<slug>  same redirects as phase 1, but no X-Robots-Tag
+#   /games and /games/<slug>  same redirects as phase 1, including
+#                              /games/privacy?x=1, but no X-Robots-Tag
 #   /games/ and each slug and /games/privacy/
 #                              200, no X-Robots-Tag, HSTS present
 #   assets, css, js            200, no X-Robots-Tag
@@ -119,28 +122,53 @@ fi
 
 failures=0
 
+# Read one response header. The name is matched with tolower(), which mawk
+# and macOS awk both provide. Over HTTP/2, curl prints header names in
+# lowercase (location:, x-robots-tag:, strict-transport-security:).
+header_value() {
+  local name="$1"
+  local file="$2"
+  awk -v name="$name" 'BEGIN { pat = "^" name ":" }
+    {
+      if (tolower($0) ~ pat) {
+        sub(/\r/, "")
+        sub(/^[^:]*:[[:space:]]*/, "")
+        print
+        exit
+      }
+    }
+  ' "$file"
+}
+
 location_ok() {
   local got="$1"
   local want="$2"
-  local got_base want_base origin
+  local got_cmp want_cmp origin
   got="${got//$'\r'/}"
   got="${got#"${got%%[![:space:]]*}"}"
   got="${got%"${got##*[![:space:]]}"}"
-  got_base="${got%%\?*}"
-  want_base="${want%%\?*}"
-  [[ "$got_base" == "$want_base" ]] && return 0
-  if [[ "$want_base" == /* ]]; then
+  if [[ "$want" == *\?* ]]; then
+    got_cmp="$got"
+    want_cmp="$want"
+  else
+    got_cmp="${got%%\?*}"
+    want_cmp="${want%%\?*}"
+  fi
+  [[ "$got_cmp" == "$want_cmp" ]] && return 0
+  if [[ "$want_cmp" == /* ]]; then
     origin="$BASE"
-    [[ "$got_base" == "$origin$want_base" ]] && return 0
-    [[ "$got_base" == "https://zumproductions.com$want_base" ]] && return 0
-    [[ "$got_base" == "http://zumproductions.com$want_base" ]] && return 0
+    [[ "$got_cmp" == "$origin$want_cmp" ]] && return 0
+    [[ "$got_cmp" == "https://zumproductions.com$want_cmp" ]] && return 0
+    [[ "$got_cmp" == "http://zumproductions.com$want_cmp" ]] && return 0
   fi
   return 1
 }
 
 # expect <path> <code> <location> <robots>
 # location: empty skips the check; "-" requires no Location header; otherwise
-# the Location must match that path or absolute URL (query string allowed).
+# the Location must match that path or absolute URL. A query on the expected
+# value must be kept. If the expected value has no query, one on the response
+# is ignored.
 # code may be "403|404".
 # robots: yes (header present and contains noindex), no (header absent), or "-".
 expect() {
@@ -155,10 +183,10 @@ expect() {
   if [[ ! "$code" =~ ^[0-9]{3}$ ]]; then
     code=000
   fi
-  loc=$(awk 'BEGIN{IGNORECASE=1} /^Location:/ {sub(/\r/, ""); sub(/^[^:]*:[[:space:]]*/, ""); print; exit}' "$hdr")
+  loc=$(header_value location "$hdr")
   robots_n=$(grep -ic '^x-robots-tag:' "$hdr" || true)
   robots_n=${robots_n:-0}
-  robots_line=$(awk 'BEGIN{IGNORECASE=1} /^X-Robots-Tag:/ {sub(/\r/, ""); sub(/^[^:]*:[[:space:]]*/, ""); print; exit}' "$hdr")
+  robots_line=$(header_value x-robots-tag "$hdr")
   ok=1
   detail=""
   if [[ "$want_code" == *"|"* ]]; then
@@ -210,7 +238,7 @@ expect_hsts() {
   url="${BASE}${path}"
   hdr=$(mktemp)
   curl -s -I --max-redirs 0 --max-time 25 -D "$hdr" -o /dev/null "$url" || true
-  hsts=$(awk 'BEGIN{IGNORECASE=1} /^Strict-Transport-Security:/ {sub(/\r/, ""); sub(/^[^:]*:[[:space:]]*/, ""); print; exit}' "$hdr")
+  hsts=$(header_value strict-transport-security "$hdr")
   if [[ -n "$hsts" ]]; then
     printf 'PASS  HSTS  %s  %s\n' "$path" "$hsts"
   else
@@ -262,6 +290,7 @@ if [[ "$PHASE" == "1" ]]; then
   expect /games/ 200 - yes
   expect_hsts /games/
   expect /games/privacy 301 "https://zumproductions.com/games/privacy/" -
+  expect "/games/privacy?x=1" 301 "https://zumproductions.com/games/privacy/?x=1" -
   expect /games/privacy/ 200 - yes
   expect /games/fromage-dash/ 200 - yes
   expect /games/callout-cadence/ 200 - yes
@@ -293,6 +322,7 @@ else
   expect /games/ 200 - no
   expect_hsts /games/
   expect /games/privacy 301 "https://zumproductions.com/games/privacy/" -
+  expect "/games/privacy?x=1" 301 "https://zumproductions.com/games/privacy/?x=1" -
   expect /games/privacy/ 200 - no
   expect /games/fromage-dash/ 200 - no
   expect /games/callout-cadence/ 200 - no
@@ -334,7 +364,7 @@ if [[ "$CHECK_HTTP" -eq 1 ]]; then
   BASE="http://${host}"
   hdr=$(mktemp)
   code=$(curl -s -I --max-redirs 0 --max-time 25 -D "$hdr" -o /dev/null -w '%{http_code}' "${BASE}/games/" || true)
-  loc=$(awk 'BEGIN{IGNORECASE=1} /^Location:/ {sub(/\r/, ""); sub(/^[^:]*:[[:space:]]*/, ""); print; exit}' "$hdr")
+  loc=$(header_value location "$hdr")
   if [[ "$code" =~ ^3 && "$loc" == https://* && "$loc" == *"/games/"* ]]; then
     printf 'PASS  %s  http://%s/games/  %s\n' "$code" "$host" "$loc"
   else

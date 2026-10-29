@@ -89,6 +89,8 @@ Gil uploads. Devops does not have the SFTP or Manager login. `.htaccess` in this
 git archive --format=zip -o /tmp/zumproductions-prelaunch.zip HEAD css js games assets/games assets/favicon.png assets/logo-mark.png assets/logo-mark.svg assets/logo-wordmark.svg assets/fonts assets/og-image.png
 ```
 
+Until launch, the `/favicon.ico` link on the new pages serves the old live icon. That is expected. The new `favicon.ico` is uploaded at launch.
+
 **Launch only:** `index.html`, `privacy.html`, `terms.html`, `404.html`, `favicon.ico`, `css/`, `js/`, the rest of `assets/`, and `robots.txt`. `404.html` loads `/css/styles.css` and `/js/nav.js`, so those two directories are in this zip as well. The launch upload is self-contained, and it expects the pre-launch upload to be done already. `robots.txt` allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line. `favicon.ico` is a 16, 32 and 48 pixel file made from `assets/favicon.png`, for the launch swap of the old icon. `404.html` is not wired up until the catch-all is replaced.
 
 ```bash
@@ -104,7 +106,7 @@ After the pre-launch upload, the only games-page links that still miss are `inde
 ### Rollback
 
 1. Re-upload the saved live `.htaccess` first. That is the only file that changes how existing URLs behave. `/games/` can be reached directly, but it is noindexed and not linked from the live site. Restoring the saved file removes the privacy redirect and the `X-Robots-Tag` header. The pages keep their meta noindex.
-2. If that is not enough, remove the new folders and pages (`games/`, the six added asset files or `assets/` if the rest was uploaded, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, `terms.html`, `404.html`, and `favicon.ico`). Restore `robots.txt` from the backup. Do not delete it and leave the site without one.
+2. If that is not enough, delete only files that were new: `games/`, the six added asset files or `assets/` if the rest was uploaded, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, and `terms.html`. For any launch file that replaces an existing live file, restore it from the backup instead of deleting it: `favicon.ico`, `robots.txt`, and `404.html` if one exists live. Do not delete `robots.txt` and leave the site without one.
 3. Last resort: restore from Infomaniak's automatic backups (Manager, Backups). Check the retention shown there before relying on it.
 
 ### Launch-day checklist
