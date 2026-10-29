@@ -79,7 +79,7 @@ Gil uploads. Devops does not have the SFTP or Manager login. `.htaccess` in this
 1. Gil downloads a full backup of the live site to his own disk, `.htaccess` and `robots.txt` included, plus `/en/`, `/404/`, `/404.html`, `/static/`, `/page-data/`, and `favicon.ico`. He also notes the date of the latest automatic backup in Infomaniak Manager. Keep that copy off the server. Do not leave `.htaccess.bak` or a zip in the docroot.
 2. He uploads the new files. Files are mode 644, folders are mode 755. Never 777. Transfer binary (or Auto with no line-ending rewrite). `.htaccess`, once edited, stays 644.
 3. He edits the live `.htaccess` in place, as the last upload step. Merge the template line by line. Do not replace the live file.
-4. Then he runs `scripts/post-merge-curl.sh`. The expected results are in that script. The plain-`http` check has to be run from another network.
+4. Then he runs `scripts/post-merge-curl.sh` (phase 1, the default). After launch he runs `scripts/post-merge-curl.sh https://zumproductions.com 2`. The script prints PASS or FAIL per check and exits 1 on any mismatch. Add `--check-http` only from another network; that flag checks the plain-`http` to `https` redirect.
 
 ### What to upload, in two phases
 
@@ -103,7 +103,7 @@ After the pre-launch upload, the only games-page links that still miss are `inde
 
 ### Rollback
 
-1. Re-upload the saved live `.htaccess` first. That is the only file that changes how existing URLs behave, and it is enough if the new folders are still hidden behind `/en/`.
+1. Re-upload the saved live `.htaccess` first. That is the only file that changes how existing URLs behave. `/games/` can be reached directly, but it is noindexed and not linked from the live site. Restoring the saved file removes the privacy redirect and the `X-Robots-Tag` header. The pages keep their meta noindex.
 2. If that is not enough, remove the new folders and pages (`games/`, the six added asset files or `assets/` if the rest was uploaded, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, `terms.html`, `404.html`, and `favicon.ico`). Restore `robots.txt` from the backup. Do not delete it and leave the site without one.
 3. Last resort: restore from Infomaniak's automatic backups (Manager, Backups). Check the retention shown there before relying on it.
 
@@ -115,7 +115,7 @@ Do not do these until Gil says the section goes live.
 
 (c) Upload this repo's `robots.txt` over the live one. The live file disallows `/assets/`, which blocks the new images, fonts, and OG image. Also upload `favicon.ico` from the repo root over the old icon.
 
-(d) `ErrorDocument 404 /404.html` does nothing until the live soft-404 catch-all (the `!-f`/`!-d` rule that 301s to `/404/`) is replaced. `404.html` is in the repo and uses root-absolute paths only. The `ErrorDocument` line in `.htaccess` is commented. Do not enable it beside the old catch-all.
+(d) `ErrorDocument 404 /404.html` does nothing until the live soft-404 catch-all (the `!-f`/`!-d` rule that 301s to `/404/`) is replaced. `404.html` is in the repo and uses root-absolute paths only. The `ErrorDocument` line in `.htaccess` is commented and sits outside `<IfModule mod_rewrite.c>`, because it is a core directive. Do not enable it beside the old catch-all.
 
 (e) Remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date. Removing the meta tags is a new commit, then re-upload the eight games HTML files:
 
@@ -123,7 +123,7 @@ Do not do these until Gil says the section goes live.
 git archive --format=zip -o /tmp/zumproductions-games-html.zip HEAD games/index.html games/privacy/index.html games/fromage-dash/index.html games/callout-cadence/index.html games/alp-graze/index.html games/summit-rescue/index.html games/funicular-fix/index.html games/fondue-frenzy/index.html
 ```
 
-Run the curl script again and expect no `X-Robots-Tag`.
+Run `scripts/post-merge-curl.sh https://zumproductions.com 2` and expect no `X-Robots-Tag`.
 
 When the commented hardening block is merged, its rewrite rules go before the live catch-all. Replace the live `Strict-Transport-Security` line. Do not add a second one: the later line wins.
 

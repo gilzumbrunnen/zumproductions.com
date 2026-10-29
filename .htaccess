@@ -35,9 +35,11 @@ DirectoryIndex index.html
   # RewriteCond %{REQUEST_FILENAME} !-f
   # RewriteCond %{REQUEST_FILENAME} !-d
   # RewriteRule ^ /404/ [R=301,L]
-  # # # [LAUNCH ONLY, do not enable yet] Replace that catch-all (do not leave both on) with:
-  # ErrorDocument 404 /404.html
 </IfModule>
+
+# # # [LAUNCH ONLY, do not enable yet] Replace that catch-all (do not leave both on).
+# # # ErrorDocument is a core directive, so it stays outside <IfModule mod_rewrite.c>.
+# ErrorDocument 404 /404.html
 
 # NEW (PR #3): temporary noindex for the unpublished games section. Remove at launch.
 <IfModule mod_headers.c>
