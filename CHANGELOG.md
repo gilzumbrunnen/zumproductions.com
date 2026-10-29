@@ -21,6 +21,10 @@
 - Hero text sits on a darker scrim. Footer focus rings use `#C4B5FD`.
 - Game privacy links are absolute: `https://zumproductions.com/games/privacy/#slug`.
 
+### Changed
+
+- Studio contact is sales@zumproductions.com, including the quote button and the footer on the studio pages. Games pages use games@zumproductions.com in the footer. privacy@ stays on the privacy notice, the terms questions line, and the games privacy policy.
+
 Do not merge this until the section is meant to go live.
 
 ### Deploy notes / launch blockers
@@ -46,7 +50,7 @@ Do not merge this until the section is meant to go live.
 
 - Hero lede, eyebrow (Swiss digital studio), service blurbs, and contact heading.
 - Primary contact button is "Send a short brief". Hero button stays "Talk to us".
-- Public contact address is hello@zumproductions.com. privacy@ stays on the privacy notice and the terms questions line.
+- Public contact address is sales@zumproductions.com for the studio. games@ covers games. privacy@ stays on the privacy notice, the terms questions line, and the games privacy policy.
 - Trust line under the hero actions. Newsletter line removed from the footer.
 - Privacy and terms pages use short notice language. Meta descriptions match the new lede.
 
