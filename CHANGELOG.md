@@ -21,6 +21,14 @@
 
 Do not merge this until the section is meant to go live.
 
+### Deploy notes / launch blockers
+
+- (a) Deploys are manual SFTP or file-manager uploads. Merge `.htaccess` into the live file. Do not replace it, and do not upload README, CHANGELOG, or `scripts/`.
+- (b) At launch, remove the live `/` to `/en/` rule. It hides the new `index.html`.
+- (c) The live `robots.txt` is not in git and has `Disallow: /assets/`, which blocks the new images, fonts, and OG image. Replace it with this repo's `robots.txt`, or add one if the repo has none.
+- (d) Consider `ErrorDocument 404 /404/index.html` and a real 404 page for a proper 404 status. Documented only. The page is not built.
+- (e) At launch, remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date.
+
 
 ## [0.1.2] - 2026-10-25
 

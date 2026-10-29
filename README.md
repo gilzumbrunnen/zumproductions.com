@@ -67,3 +67,15 @@ Support on each game page is games@zumproductions.com. The privacy contact on th
 Ink `#0B1F2A`, purple `#6D28D9` (hover `#5B21B6`), background `#F8F6F3`. `#8B5CF6` is decorative only. Inter is self-hosted in `assets/fonts/` so the page does not call Google Fonts. The stack falls back to system UI fonts if the file does not load.
 
 Public contact is `hello@zumproductions.com`. `privacy@zumproductions.com` stays on the studio privacy notice, the terms questions line, and the games privacy policy.
+
+## Deploy notes / launch blockers
+
+(a) Deploys are manual SFTP or file-manager uploads. Merge `.htaccess` into the live file. Do not replace the live file, and do not upload README, CHANGELOG, or `scripts/`.
+
+(b) At launch, remove the live `/` to `/en/` rule. It hides the new `index.html`.
+
+(c) The live `robots.txt` is not in git and has `Disallow: /assets/`, which blocks the new images, fonts, and OG image. Replace it with this repo's `robots.txt`, or add one if the repo has none.
+
+(d) Consider `ErrorDocument 404 /404/index.html` and a real 404 page so missing URLs return 404. Not built yet.
+
+(e) At launch, remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date.

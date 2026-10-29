@@ -1,14 +1,37 @@
-# Host config for the static site. This repo did not previously contain
-# Apache config. The live site is Apache and currently 301s unknown paths
-# such as /games/privacy to /404/. Devops: if production already has its
-# own .htaccess, merge these rules into that file. Do not let this file
-# replace a config that holds the rest of the site. The redirect below
-# has to run before that 404 catch-all.
+# NEVER upload this file over the live document-root .htaccess.
+# Reconcile it line by line with the live file first (SFTP port 22 or the
+# Infomaniak file manager). The live file is not in git. This copy is a
+# merge template, built from rules inferred over HTTPS on 2026-10-29.
+#
+# In .htaccess, mod_rewrite runs before mod_alias, so RedirectMatch loses
+# to the live !-f/!-d catch-all that 301s to /404/. The privacy redirect
+# below is a RewriteRule and must sit before that catch-all.
 
-# Exact URL only. /games/privacy/ is the page the games link to.
-RedirectMatch 301 ^/games/privacy$ /games/privacy/
+Options -Indexes
+DirectoryIndex index.html
 
-# Unpublished games section. Remove this block at launch.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # [KEEP LIVE VERSION] HTTPS and www -> apex. Observed: www 301s to the apex with the path kept.
+  # If live does this in the Infomaniak panel rather than here, do not add these lines.
+  # RewriteCond %{HTTP_HOST} ^www\.zumproductions\.com$ [NC]
+  # RewriteRule ^ https://zumproductions.com%{REQUEST_URI} [R=301,L]
+
+  # NEW (PR #3): exact path only. Must come before the 404 catch-all.
+  RewriteRule ^games/privacy$ /games/privacy/ [R=301,L]
+
+  # [LIVE, old Gatsby site] "/" -> "/en/" (query kept). DELETE AT LAUNCH.
+  # RewriteRule ^$ /en/ [R=301,L]
+
+  # [KEEP LIVE VERSION] Catch-all. Observed: 301 to /404/ for missing files and dirs only.
+  # Inferred shape. Keep the real live rule, and keep it after the privacy redirect.
+  # RewriteCond %{REQUEST_FILENAME} !-f
+  # RewriteCond %{REQUEST_FILENAME} !-d
+  # RewriteRule ^ /404/ [R=301,L]
+</IfModule>
+
+# NEW (PR #3): temporary noindex for the unpublished games section. Remove at launch.
 <IfModule mod_headers.c>
   <IfModule mod_setenvif.c>
     SetEnvIf Request_URI "^/games(/|$)" zum_games_unpublished
@@ -16,3 +39,6 @@ RedirectMatch 301 ^/games/privacy$ /games/privacy/
     Header set X-Robots-Tag "noindex" env=zum_games_unpublished
   </IfModule>
 </IfModule>
+
+# [KEEP LIVE VERSION] Anything else in the live file: HSTS (max-age=16000000) if set here,
+# rules that deny .git/.env, AddType/Expires, password protection, and so on.
