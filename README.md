@@ -70,7 +70,11 @@ Public contact is `hello@zumproductions.com`. `privacy@zumproductions.com` stays
 
 ## Deploy notes / launch blockers
 
-(a) Deploys are manual SFTP or file-manager uploads. `.htaccess` here is a merge template, never a file to upload. Merge it into the live file. Do not replace the live file, and do not upload README, CHANGELOG, or `scripts/`.
+(a) Deploys are manual SFTP or file-manager uploads. `.htaccess` here is a merge template, never a file to upload. Merge it into the live file. Do not replace the live file. Do not upload README, CHANGELOG, `scripts/`, `.git/`, or dotfiles. The public tree is only `index.html`, `privacy.html`, `terms.html`, `css/`, `js/`, `assets/`, and `games/`. Or build a bundle that cannot include `.git` or dotfiles:
+
+```bash
+git archive --format=zip -o /tmp/zumproductions-deploy.zip HEAD index.html privacy.html terms.html css js assets games
+```
 
 (b) At launch, remove the live `/` to `/en/` rule. It hides the new `index.html`.
 
