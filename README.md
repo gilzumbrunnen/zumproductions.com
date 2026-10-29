@@ -86,8 +86,9 @@ Public contact is `hello@zumproductions.com`. `privacy@zumproductions.com` stays
 
 After that merge, `curl -I` these URLs. None of them should return 500:
 
-- `https://zumproductions.com/`
+- `https://zumproductions.com/` (still 301s to `/en/` until blocker (b) is done)
+- `https://zumproductions.com/privacy.html` (must not carry `X-Robots-Tag`)
 - `https://zumproductions.com/games/`
 - `https://zumproductions.com/games/privacy` (expect 301 to the trailing slash)
 - `https://zumproductions.com/games/privacy/` (expect 200, plus `X-Robots-Tag` until launch)
-- one asset under `https://zumproductions.com/assets/games/`
+- one asset under `https://zumproductions.com/assets/games/` (should carry `X-Robots-Tag: noindex` until launch)

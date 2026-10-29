@@ -11,6 +11,7 @@
 - Support on each game page is games@zumproductions.com. The privacy contact on the games policy stays privacy@zumproductions.com.
 - Screenshots are still missing for Callout Cadence, Summit Rescue, Funicular Fix, and Fondue Frenzy.
 - Games hero art is in `assets/games/hero/` under stable names (`games_hero_1600x600` and `games_hero_3200x1200`, WebP and PNG).
+- Hero repaint: the Fromage Dash mouse now wears goggles and a scarf. Same filenames and dimensions. AVIF and the PNG fallbacks were regenerated with the same settings.
 - This repo has no Content-Security-Policy file. The games pages add no third-party scripts, fonts, or trackers.
 - `.htaccess` redirects `/games/privacy` to `/games/privacy/` and sends `X-Robots-Tag: noindex` for `/games/` and `/assets/games/`. Devops: merge this into the live Apache config ahead of the `/404/` catch-all. Remove the noindex header at launch.
 - Game icons keep a fixed 72px box so they do not squash on a narrow screen.
@@ -30,7 +31,7 @@ Do not merge this until the section is meant to go live.
 - (e) At launch, remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date.
 - (f) Merging PR #3 makes Games public through the nav and the homepage teaser, so merge only on Gil's explicit go.
 - (g) Devops must confirm the document root and merge `.htaccess` into the live file.
-- After that merge, `curl -I` `https://zumproductions.com/`, `/games/`, `/games/privacy` (expect 301 to the trailing slash), `/games/privacy/` (expect 200 plus `X-Robots-Tag` until launch), and one asset under `/assets/games/`. None of these should return 500.
+- After that merge, `curl -I` `/` (still 301s to `/en/` until blocker (b) is done), `/privacy.html` (must not carry `X-Robots-Tag`), `/games/`, `/games/privacy` (expect 301 to the trailing slash), `/games/privacy/` (expect 200 plus `X-Robots-Tag` until launch), and one asset under `/assets/games/` (should carry `X-Robots-Tag: noindex` until launch). None of these should return 500.
 
 
 ## [0.1.2] - 2026-10-25
