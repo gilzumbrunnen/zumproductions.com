@@ -31,7 +31,7 @@ Do not merge this until the section is meant to go live.
 - (e) At launch, remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date.
 - (f) Merging PR #3 makes Games public through the nav and the homepage teaser, so merge only on Gil's explicit go.
 - (g) Devops must confirm the document root and merge `.htaccess` into the live file.
-- (h) `privacy.html` in this unmerged PR stays indexable (no `noindex`). Confirm the bracketed facts (host, log retention, mail provider, data centre), then remove the marks and set the effective date.
+- (h) Set the `privacy.html` effective date at publish. The games@ mailbox must exist before merge (or switch the games pages and the games policy to privacy@).
 - After that merge, `curl -I` `/` (still 301s to `/en/` until blocker (b) is done), `/privacy.html` (must not carry `X-Robots-Tag`), `/games/`, `/games/privacy` (expect 301 to the trailing slash), `/games/privacy/` (expect 200 plus `X-Robots-Tag` until launch), and one asset under `/assets/games/` (should carry `X-Robots-Tag: noindex` until launch). None of these should return 500.
 
 

@@ -90,7 +90,7 @@ git archive --format=zip -o /tmp/zumproductions-deploy.zip HEAD index.html priva
 
 (g) Devops must confirm the document root and merge `.htaccess` into the live file.
 
-(h) `privacy.html` in this unmerged PR stays indexable (no `noindex`). Confirm the bracketed facts (host, log retention, mail provider, data centre), then remove the marks and set the effective date.
+(h) Set the `privacy.html` effective date at publish. The games@ mailbox must exist before merge (or switch the games pages and the games policy to privacy@).
 
 After that merge, `curl -I` these URLs. None of them should return 500:
 
