@@ -23,7 +23,7 @@
 
 ### Changed
 
-- Studio contact is sales@zumproductions.com, including the quote button and the footer on the studio pages. Games pages use games@zumproductions.com in the footer. privacy@ stays on the privacy notice, the terms questions line, and the games privacy policy.
+- Studio contact is hello@zumproductions.com (bonjour@zumproductions.com on French content), including the quote button and the footer on the studio pages. Games pages use games@zumproductions.com in the footer. privacy@ stays on the privacy notice, the terms questions line, and the games privacy policy.
 
 Do not merge this until the section is meant to go live.
 
@@ -50,7 +50,7 @@ Do not merge this until the section is meant to go live.
 
 - Hero lede, eyebrow (Swiss digital studio), service blurbs, and contact heading.
 - Primary contact button is "Send a short brief". Hero button stays "Talk to us".
-- Public contact address is sales@zumproductions.com for the studio. games@ covers games. privacy@ stays on the privacy notice, the terms questions line, and the games privacy policy.
+- Public contact address is hello@zumproductions.com for the studio (bonjour@zumproductions.com on French content). games@ covers games. privacy@ stays on the privacy notice, the terms questions line, and the games privacy policy.
 - Trust line under the hero actions. Newsletter line removed from the footer.
 - Privacy and terms pages use short notice language. Meta descriptions match the new lede.
 
