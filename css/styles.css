@@ -896,6 +896,15 @@ a.game-card:hover .status-pill {
   border-top: 1px solid var(--border);
 }
 
+.todo {
+  padding: 0.02em 0.35em;
+  border: 1px dashed var(--purple);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+}
+
 .policy-date {
   display: inline-block;
   padding: 0.02em 0.4em;

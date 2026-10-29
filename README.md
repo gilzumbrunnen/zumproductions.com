@@ -76,6 +76,8 @@ Public contact is `hello@zumproductions.com`. `privacy@zumproductions.com` stays
 git archive --format=zip -o /tmp/zumproductions-deploy.zip HEAD index.html privacy.html terms.html css js assets games
 ```
 
+`.gitattributes` marks `.gitkeep` as `export-ignore`, so that zip has no dotfiles.
+
 (b) At launch, remove the live `/` to `/en/` rule. It hides the new `index.html`.
 
 (c) This repo has no `robots.txt`. The live one is not in git and has `Disallow: /assets/`, which blocks the new images, fonts, and OG image. At launch, replace the live file with a `robots.txt` that does not disallow `/assets/`, or add one to the repo then.
@@ -87,6 +89,8 @@ git archive --format=zip -o /tmp/zumproductions-deploy.zip HEAD index.html priva
 (f) Merging PR #3 makes Games public through the nav and the homepage teaser, so merge only on Gil's explicit go.
 
 (g) Devops must confirm the document root and merge `.htaccess` into the live file.
+
+(h) `privacy.html` in this unmerged PR stays indexable (no `noindex`). Confirm the bracketed facts (host, log retention, mail provider, data centre), then remove the marks and set the effective date.
 
 After that merge, `curl -I` these URLs. None of them should return 500:
 

@@ -63,6 +63,7 @@ DirectoryIndex index.html
 # # ServerSignature Off
 # #
 # # <IfModule mod_rewrite.c>
+# #   # Drop this RewriteEngine On when uncommenting. The live file already turns rewrite on.
 # #   RewriteEngine On
 # #
 # #   # --- HTTPS + apex in one hop. [KEEP LIVE VERSION] if live/panel already does this.
@@ -84,6 +85,7 @@ DirectoryIndex index.html
 # #   RewriteRule \.(bak|backup|old|orig|save|swp|swo|tmp|sql|sqlite|db|log|ini|conf|cfg|env|dist|ya?ml|toml|lock|sh|py|md|psd|zip|tar|t?gz|7z|rar)$ - [R=404,NC,L]
 # #   RewriteRule ~$ - [R=404,L]
 # #
+# #   # Drop this privacy rule when uncommenting. The active rule above is the same redirect.
 # #   # --- NEW (PR #3): exact path, absolute https target. Keep before the 404 catch-all.
 # #   RewriteRule ^games/privacy$ https://zumproductions.com/games/privacy/ [R=301,L]
 # # </IfModule>
