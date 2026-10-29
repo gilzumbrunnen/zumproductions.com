@@ -29,7 +29,7 @@ Then open [http://localhost:8000/](http://localhost:8000/).
 | `assets/` | Logo, service icons, favicon, OG image, self-hosted Inter |
 | `assets/games/<slug>/` | Icon, feature graphic, optional title logo, screenshots |
 
-The games pages are not published. They send `noindex`. The live host is Apache and currently sends unknown paths such as `/games/privacy` to `/404/`. `.htaccess` at the repo root redirects that exact path to `/games/privacy/` and sets `X-Robots-Tag: noindex` on `/games/` and `/assets/games/`. Devops needs to confirm that file is the document root config, and that the redirect runs before the existing 404 rule. Remove the noindex header at launch. Python's static server still adds the slash on its own.
+The games pages are not published. They send `noindex`. `.htaccess` in this repo is a merge template, never a file to upload over the live one. It shows where the `/games/privacy` rewrite and the temporary `X-Robots-Tag: noindex` belong. See the deploy notes. Python's static server still adds the slash on its own.
 
 ## Games art
 
@@ -48,7 +48,7 @@ python3 scripts/optimize-games-art.py
 
 Needs Pillow, `cwebp`, `avifenc`, and `pngquant`. Screenshots for Callout Cadence, Summit Rescue, Funicular Fix, and Fondue Frenzy are not in yet. Drop PNGs in that game's `shots/` folder and rerun the same script.
 
-The games hero files live in `assets/games/hero/` and keep these names: `games_hero_1600x600` and `games_hero_3200x1200`, each as AVIF, WebP, and PNG. The page offers them with width descriptors and `sizes="100vw"`. Replace the files in place if the art is repainted.
+The games hero files live in `assets/games/hero/` and keep these names: `games_hero_1600x600` and `games_hero_3200x1200`, each as AVIF, WebP, and PNG. The page offers them with width descriptors. `sizes` is `100vw`, and `(max-width: 640px) 59rem` where the hero is cover-cropped to the 22rem frame. Replace the files in place if the art is repainted.
 
 ## Games privacy policy
 
@@ -70,12 +70,24 @@ Public contact is `hello@zumproductions.com`. `privacy@zumproductions.com` stays
 
 ## Deploy notes / launch blockers
 
-(a) Deploys are manual SFTP or file-manager uploads. Merge `.htaccess` into the live file. Do not replace the live file, and do not upload README, CHANGELOG, or `scripts/`.
+(a) Deploys are manual SFTP or file-manager uploads. `.htaccess` here is a merge template, never a file to upload. Merge it into the live file. Do not replace the live file, and do not upload README, CHANGELOG, or `scripts/`.
 
 (b) At launch, remove the live `/` to `/en/` rule. It hides the new `index.html`.
 
-(c) The live `robots.txt` is not in git and has `Disallow: /assets/`, which blocks the new images, fonts, and OG image. Replace it with this repo's `robots.txt`, or add one if the repo has none.
+(c) This repo has no `robots.txt`. The live one is not in git and has `Disallow: /assets/`, which blocks the new images, fonts, and OG image. At launch, replace the live file with a `robots.txt` that does not disallow `/assets/`, or add one to the repo then.
 
 (d) Consider `ErrorDocument 404 /404/index.html` and a real 404 page so missing URLs return 404. Not built yet.
 
 (e) At launch, remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date.
+
+(f) Merging PR #3 makes Games public through the nav and the homepage teaser, so merge only on Gil's explicit go.
+
+(g) Devops must confirm the document root and merge `.htaccess` into the live file.
+
+After that merge, `curl -I` these URLs. None of them should return 500:
+
+- `https://zumproductions.com/`
+- `https://zumproductions.com/games/`
+- `https://zumproductions.com/games/privacy` (expect 301 to the trailing slash)
+- `https://zumproductions.com/games/privacy/` (expect 200, plus `X-Robots-Tag` until launch)
+- one asset under `https://zumproductions.com/assets/games/`

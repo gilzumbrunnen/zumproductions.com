@@ -7,7 +7,8 @@
 # to the live !-f/!-d catch-all that 301s to /404/. The privacy redirect
 # below is a RewriteRule and must sit before that catch-all.
 
-Options -Indexes
+# [ADD ONLY IF ALLOWED] the live site already has -Indexes. If the host disallows Options overrides this 500s the whole site.
+# Options -Indexes
 DirectoryIndex index.html
 
 <IfModule mod_rewrite.c>

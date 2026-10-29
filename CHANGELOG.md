@@ -14,7 +14,7 @@
 - This repo has no Content-Security-Policy file. The games pages add no third-party scripts, fonts, or trackers.
 - `.htaccess` redirects `/games/privacy` to `/games/privacy/` and sends `X-Robots-Tag: noindex` for `/games/` and `/assets/games/`. Devops: merge this into the live Apache config ahead of the `/404/` catch-all. Remove the noindex header at launch.
 - Game icons keep a fixed 72px box so they do not squash on a narrow screen.
-- Portrait screenshot `sizes` follow the single column on small screens. Feature graphics stop at their native 1024px.
+- Portrait screenshot `sizes` follow the real column count (one column below 424px, two until 623px, three from 624px to 799px). Feature graphics stop at their native 1024px. Hero `sizes` uses 59rem under 640px, where the image is cover-cropped into the 22rem frame.
 - Hero art adds AVIF and uses width descriptors. PNG fallbacks are compressed. Screenshot enlargements open the WebP.
 - Hero text sits on a darker scrim. Footer focus rings use `#C4B5FD`.
 - Game privacy links are absolute: `https://zumproductions.com/games/privacy/#slug`.
@@ -23,11 +23,14 @@ Do not merge this until the section is meant to go live.
 
 ### Deploy notes / launch blockers
 
-- (a) Deploys are manual SFTP or file-manager uploads. Merge `.htaccess` into the live file. Do not replace it, and do not upload README, CHANGELOG, or `scripts/`.
+- (a) Deploys are manual SFTP or file-manager uploads. `.htaccess` here is a merge template, never a file to upload. Merge it into the live file. Do not replace it, and do not upload README, CHANGELOG, or `scripts/`.
 - (b) At launch, remove the live `/` to `/en/` rule. It hides the new `index.html`.
-- (c) The live `robots.txt` is not in git and has `Disallow: /assets/`, which blocks the new images, fonts, and OG image. Replace it with this repo's `robots.txt`, or add one if the repo has none.
+- (c) This repo has no `robots.txt`. The live one is not in git and has `Disallow: /assets/`, which blocks the new images, fonts, and OG image. At launch, replace the live file with a `robots.txt` that does not disallow `/assets/`, or add one to the repo then.
 - (d) Consider `ErrorDocument 404 /404/index.html` and a real 404 page for a proper 404 status. Documented only. The page is not built.
 - (e) At launch, remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date.
+- (f) Merging PR #3 makes Games public through the nav and the homepage teaser, so merge only on Gil's explicit go.
+- (g) Devops must confirm the document root and merge `.htaccess` into the live file.
+- After that merge, `curl -I` `https://zumproductions.com/`, `/games/`, `/games/privacy` (expect 301 to the trailing slash), `/games/privacy/` (expect 200 plus `X-Robots-Tag` until launch), and one asset under `/assets/games/`. None of these should return 500.
 
 
 ## [0.1.2] - 2026-10-25
