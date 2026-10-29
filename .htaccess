@@ -35,6 +35,8 @@ DirectoryIndex index.html
   # RewriteCond %{REQUEST_FILENAME} !-f
   # RewriteCond %{REQUEST_FILENAME} !-d
   # RewriteRule ^ /404/ [R=301,L]
+  # # # [LAUNCH ONLY, do not enable yet] Replace that catch-all (do not leave both on) with:
+  # ErrorDocument 404 /404.html
 </IfModule>
 
 # NEW (PR #3): temporary noindex for the unpublished games section. Remove at launch.
@@ -55,6 +57,8 @@ DirectoryIndex index.html
 # # </FilesMatch>
 
 # [LAUNCH HARDENING: Devops applies one line at a time, after merging with the live file]
+# Put this block's rewrite rules before the live catch-all. Replace the live
+# Strict-Transport-Security line instead of adding a second one: the later line wins.
 # Nothing in this block is active. Options and ServerSignature can 500 the site if the
 # host disallows those overrides. Drop zip/gz (and the other archive types) from the deny
 # list if the live docroot has real downloads. Do not duplicate headers the Infomaniak

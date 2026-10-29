@@ -26,12 +26,13 @@ Do not merge this until the section is meant to go live.
 ### Deploy notes / launch blockers
 
 - **Never use mirror, sync, or "delete missing files" in the SFTP client.** That would wipe `/en/` and `/404/` and take the live site down.
-- Pre-launch upload is only `games/`, `assets/games/`, `css/`, and `js/`. `index.html`, `privacy.html`, and `terms.html` wait until launch, because they show the Games nav and teaser and are not `noindex`. `robots.txt` in this repo is launch-only (allow all, no `/assets/` disallow, no `Sitemap:` line because there is no sitemap).
-- The ordered upload, the two archive commands, what the games pages still request from the rest of `assets/`, and the rollback steps are in the README. `css/` and `js/` do not restyle the 2021 pages.
-- (d) `ErrorDocument 404` does nothing until the live catch-all that 301s to `/404/` is replaced. The new 404 page is not built. It must use root-absolute paths.
-- (e) Removing the games `noindex` meta tags is a new commit and a re-upload of the eight games HTML files.
+- Pre-launch upload is `games/`, `assets/games/`, `css/`, `js/`, and six shared files that are not on the live site: `assets/favicon.png`, `assets/logo-mark.png`, `assets/logo-mark.svg`, `assets/logo-wordmark.svg`, `assets/fonts/inter-latin.woff2`, and `assets/og-image.png`. Command: `git archive --format=zip -o /tmp/zumproductions-prelaunch.zip HEAD css js games assets/games assets/favicon.png assets/logo-mark.png assets/logo-mark.svg assets/logo-wordmark.svg assets/fonts assets/og-image.png`. `index.html`, `privacy.html`, `terms.html`, `404.html`, and `favicon.ico` wait until launch. `robots.txt` is launch-only (allow all, no `/assets/` disallow, no `Sitemap:` line). `css/` and `js/` do not restyle the 2021 pages. Links to `/` still reach that site. Links to `privacy.html` and `terms.html` follow the catch-all to `/404/` until launch.
+- Rollback step 2 removes the new paths and restores `robots.txt` from the backup. It does not delete `robots.txt` and leave the site without one. The rest of the runbook is in the README.
+- (d) `ErrorDocument 404 /404.html` does nothing until the live catch-all that 301s to `/404/` is replaced. `404.html` is in the repo, uses root-absolute paths, and is not active.
+- (e) Removing the games `noindex` meta tags is a new commit, then `git archive --format=zip -o /tmp/zumproductions-games-html.zip HEAD games/index.html games/privacy/index.html games/fromage-dash/index.html games/callout-cadence/index.html games/alp-graze/index.html games/summit-rescue/index.html games/funicular-fix/index.html games/fondue-frenzy/index.html`.
+- Hardening rewrite rules go before the live catch-all. Replace the live HSTS line. A second line loses, because the later one wins.
 - (h) Set the `privacy.html` effective date at publish. The games@ mailbox must exist before merge (or switch the games pages and the games policy to privacy@).
-- Checks: `scripts/post-merge-curl.sh`. That file is `export-ignore` and is not part of the upload. The plain-`http` check has to be run from another network.
+- Checks: `scripts/post-merge-curl.sh` (`#!/bin/bash`, fixed path `/no-such-page-pr3-check`). Phase 1: `/games` is 301 to `/games/`. `/assets/fonts/` is 301 to `/404/` before the upload and 403 after it. `/terms.html` is 301 to `/404/` until launch. The script header has the launch-phase set. `scripts/` is `export-ignore`. The plain-`http` check has to be run from another network.
 
 
 ## [0.1.2] - 2026-10-25

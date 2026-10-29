@@ -83,28 +83,28 @@ Gil uploads. Devops does not have the SFTP or Manager login. `.htaccess` in this
 
 ### What to upload, in two phases
 
-**Pre-launch:** `games/`, `assets/games/`, `css/`, and `js/` only.
+**Pre-launch:** `games/`, `assets/games/`, `css/`, `js/`, plus six shared files that are not on the live site today: `assets/favicon.png`, `assets/logo-mark.png`, `assets/logo-mark.svg`, `assets/logo-wordmark.svg`, `assets/fonts/` (`inter-latin.woff2`), and `assets/og-image.png`.
 
 ```bash
-git archive --format=zip -o /tmp/zumproductions-prelaunch.zip HEAD css js games assets/games
+git archive --format=zip -o /tmp/zumproductions-prelaunch.zip HEAD css js games assets/games assets/favicon.png assets/logo-mark.png assets/logo-mark.svg assets/logo-wordmark.svg assets/fonts assets/og-image.png
 ```
 
-**Launch only:** `index.html`, `privacy.html`, `terms.html`, the rest of `assets/` (logos, favicon, font, OG image), and `robots.txt`. `robots.txt` in this repo is launch-only: it allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line.
+**Launch only:** `index.html`, `privacy.html`, `terms.html`, `404.html`, `favicon.ico`, the rest of `assets/`, and `robots.txt`. `robots.txt` allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line. `favicon.ico` is a 16, 32 and 48 pixel file made from `assets/favicon.png`, for the launch swap of the old icon. `404.html` is not wired up until the catch-all is replaced.
 
 ```bash
-git archive --format=zip -o /tmp/zumproductions-launch.zip HEAD index.html privacy.html terms.html assets robots.txt
+git archive --format=zip -o /tmp/zumproductions-launch.zip HEAD index.html privacy.html terms.html 404.html favicon.ico assets robots.txt
 ```
 
 Do not upload README, CHANGELOG, `scripts/`, `.git/`, or other dotfiles. `scripts/` and `.gitkeep` are `export-ignore` in `.gitattributes`, so these zips contain no dotfiles. Run the archive on `main` after the merge and record the SHA.
 
 The new `css/styles.css` and `js/nav.js` are not referenced by the 2021 pages, and those paths do not exist on the live site today. Uploading them does not change how the 2021 pages look.
 
-Games pages also ask for files that are not in the pre-launch set: `assets/favicon.png`, `assets/logo-wordmark.svg`, `assets/logo-mark.svg`, `assets/logo-mark.png`, `assets/fonts/inter-latin.woff2` (from the CSS), and, on `/games/` and `/games/privacy/`, `assets/og-image.png`. Until the launch upload, those requests miss and the catch-all sends them to `/404/`. The pages still load; the logo and the self-hosted font do not, and the browser falls back to a system font. Links to `/` still land on the 2021 site, which is fine while `/` redirects to `/en/`. Links to `privacy.html` and `terms.html` also miss until launch and follow the catch-all to `/404/`.
+After the pre-launch upload, the only games-page links that still miss are `index.html`, `privacy.html`, and `terms.html`. They follow the catch-all to the old `/404/`. Links to `/` still land on the 2021 site, which is fine while `/` redirects to `/en/`.
 
 ### Rollback
 
 1. Re-upload the saved live `.htaccess` first. That is the only file that changes how existing URLs behave, and it is enough if the new folders are still hidden behind `/en/`.
-2. If that is not enough, remove the new folders and pages (`games/`, `assets/games/` or `assets/`, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, `terms.html`, `robots.txt`).
+2. If that is not enough, remove the new folders and pages (`games/`, the six added asset files or `assets/` if the rest was uploaded, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, `terms.html`, `404.html`, and `favicon.ico`). Restore `robots.txt` from the backup. Do not delete it and leave the site without one.
 3. Last resort: restore from Infomaniak's automatic backups (Manager, Backups). Check the retention shown there before relying on it.
 
 ### Launch-day checklist
@@ -113,11 +113,19 @@ Do not do these until Gil says the section goes live.
 
 (b) Remove the live `/` to `/en/` rule. It hides the new `index.html`. The commented `^en(/.*)?$` rule in `.htaccess` can then 301 `/en/` and `/en/*` to `/`. Do not enable that rule while `/` still redirects to `/en/`.
 
-(c) Upload this repo's `robots.txt` over the live one. The live file disallows `/assets/`, which blocks the new images, fonts, and OG image.
+(c) Upload this repo's `robots.txt` over the live one. The live file disallows `/assets/`, which blocks the new images, fonts, and OG image. Also upload `favicon.ico` from the repo root over the old icon.
 
-(d) `ErrorDocument 404` does nothing until the live soft-404 catch-all (the `!-f`/`!-d` rule that 301s to `/404/`) is replaced. The new 404 page is not built yet. When it is, it must use root-absolute paths (`/css/styles.css`, `/assets/...`), because it will be served for any missing URL.
+(d) `ErrorDocument 404 /404.html` does nothing until the live soft-404 catch-all (the `!-f`/`!-d` rule that 301s to `/404/`) is replaced. `404.html` is in the repo and uses root-absolute paths only. The `ErrorDocument` line in `.htaccess` is commented. Do not enable it beside the old catch-all.
 
-(e) Remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date. Removing the meta tags is a new commit, then re-upload the eight games HTML files. Run the curl script again and expect no `X-Robots-Tag`.
+(e) Remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date. Removing the meta tags is a new commit, then re-upload the eight games HTML files:
+
+```bash
+git archive --format=zip -o /tmp/zumproductions-games-html.zip HEAD games/index.html games/privacy/index.html games/fromage-dash/index.html games/callout-cadence/index.html games/alp-graze/index.html games/summit-rescue/index.html games/funicular-fix/index.html games/fondue-frenzy/index.html
+```
+
+Run the curl script again and expect no `X-Robots-Tag`.
+
+When the commented hardening block is merged, its rewrite rules go before the live catch-all. Replace the live `Strict-Transport-Security` line. Do not add a second one: the later line wins.
 
 (f) Merging PR #3 makes Games public through the nav and the homepage teaser on GitHub. On the live server that only happens when `index.html` is uploaded and `/` stops redirecting to `/en/`. Merge only on Gil's explicit go.
 
@@ -125,4 +133,4 @@ Do not do these until Gil says the section goes live.
 
 (h) Set the `privacy.html` effective date at publish. The games@ mailbox must exist before merge (or switch the games pages and the games policy to privacy@).
 
-After the new 404 works, and only then, remove the Gatsby leftovers: `/en/`, `/404/`, `/404.html`, `/static/`, `/page-data/`, and the root Gatsby bundles. `/404/` loads files from `/static/`, so deleting `/static/` first breaks the old 404. Replace `/favicon.ico` in the same pass. There is no service worker, so no kill-switch file is needed.
+After the new 404 works, and only then, remove the Gatsby leftovers: `/en/`, `/404/`, `/404.html`, `/static/`, `/page-data/`, and the root Gatsby bundles. `/404/` loads files from `/static/`, so deleting `/static/` first breaks the old 404. `favicon.ico` from this repo replaces the old icon in the same pass. There is no service worker, so no kill-switch file is needed.
