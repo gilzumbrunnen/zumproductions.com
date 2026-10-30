@@ -182,14 +182,32 @@ a:hover {
 .brand {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   text-decoration: none;
   color: inherit;
+  /* Clear space is about 16% of the main logo height and 17% of the games logo height. */
+  padding: 0.625rem;
 }
 
-.brand img {
+.brand img,
+.footer-brand img {
   display: block;
-  height: 56px;
-  width: auto;
+  height: auto;
+  max-width: none;
+  object-fit: contain;
+}
+
+/* 162×56 stays above the 120px minimum. 208×56 stays above the 100px games minimum. */
+.brand img.logo-main,
+.footer-brand img.logo-main {
+  width: 162px;
+  min-width: 120px;
+}
+
+.brand img.logo-games,
+.footer-brand img.logo-games {
+  width: 208px;
+  min-width: 100px;
 }
 
 .nav-toggle {
@@ -392,23 +410,14 @@ a:hover {
 .footer-brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
   color: var(--white);
   text-decoration: none;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  padding: 0.625rem;
 }
 
-.footer-brand:hover {
+.site-footer .footer-brand:hover {
   color: var(--white);
-  text-decoration: underline;
-  text-decoration-color: var(--purple-soft);
-  text-underline-offset: 0.2em;
-}
-
-.footer-brand img {
-  width: 32px;
-  height: 32px;
+  text-decoration: none;
 }
 
 .footer-nav ul {
@@ -493,8 +502,14 @@ a:hover {
     padding: 3.25rem 0 3rem;
   }
 
-  .brand img {
-    height: 46px;
+  .brand img.logo-main,
+  .footer-brand img.logo-main {
+    width: 133px;
+  }
+
+  .brand img.logo-games,
+  .footer-brand img.logo-games {
+    width: 160px;
   }
 
   .cards {

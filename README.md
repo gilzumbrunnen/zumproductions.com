@@ -26,7 +26,9 @@ Then open [http://localhost:8000/](http://localhost:8000/).
 | `games/privacy/index.html` | Games privacy policy. In-app link: `https://zumproductions.com/games/privacy/` |
 | `css/styles.css` | Layout and the Painter palette |
 | `js/nav.js` | Mobile menu only |
-| `assets/` | Logo, service icons, favicon, OG image, self-hosted Inter |
+| `assets/` | Logos (`assets/brand/`), service icons, Open Graph images, self-hosted Inter |
+| `favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png` | Studio favicons, at the site root |
+| `games/favicon.svg`, `games/favicon-32.png`, `games/favicon-16.png`, `games/apple-touch-icon-180.png` | Games favicons |
 | `assets/games/<slug>/` | Icon, feature graphic, optional title logo, screenshots |
 
 The games pages are not published. They send `noindex`. `.htaccess` in this repo is a merge template, never a file to upload over the live one. It shows where the `/games/privacy` rewrite and the temporary `X-Robots-Tag: noindex` belong. See the deploy notes. Python's static server still adds the slash on its own.
@@ -68,6 +70,23 @@ Ink `#0B1F2A`, purple `#6D28D9` (hover `#5B21B6`), background `#F8F6F3`. `#8B5CF
 
 Public contact is `hello@zumproductions.com` for the studio (`bonjour@zumproductions.com` on French content). `games@zumproductions.com` covers games. `privacy@zumproductions.com` stays on the studio privacy notice, the terms questions line, and the games privacy policy.
 
+## Logos
+
+Approved lockups are in `assets/brand/`. The SVGs are outlined, so do not retype them, recolour them, or place them on purple.
+
+| File | Use |
+|------|-----|
+| `zum-productions_light.svg` | Zum Productions, purple and ink. White header. |
+| `zum-productions_dark.svg` | Zum Productions, lavender and white. Ink footer. |
+| `zum-games_light.svg` | Zum Games, on the games header. |
+| `zum-games_dark.svg` | Zum Games, on the games footer. |
+
+Clear space is the padding around the image. For the main logo that is the width of the purple full stop, about 16% of the logo height. For the games logo it is half the cap height of GAMES, about 17% of the logo height. On screen the main logo stays at least 120px wide and the games logo at least 100px wide. The header and footer CSS is above those floors (162px and 133px for the main logo, 208px and 160px for games).
+
+Studio pages use the root favicon set: `favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, and `apple-touch-icon-180.png`. Games pages use the set in `games/` (`favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`). There is no web manifest.
+
+Open Graph images are 1200×630 on paper `#F8F6F3`, with no effects. `assets/og-image.png` is the studio logo. `assets/og-games.png` is the games logo. Each game page still shares its own feature graphic.
+
 ## Deploy notes / launch blockers
 
 Gil uploads. Devops does not have the SFTP or Manager login. `.htaccess` in this repo is a merge template, never a file to upload.
@@ -79,22 +98,22 @@ Gil uploads. Devops does not have the SFTP or Manager login. `.htaccess` in this
 1. Gil downloads a full backup of the live site to his own disk, `.htaccess` and `robots.txt` included, plus `/en/`, `/404/`, `/404.html`, `/static/`, `/page-data/`, and `favicon.ico`. He also notes the date of the latest automatic backup in Infomaniak Manager. Keep that copy off the server. Do not leave `.htaccess.bak` or a zip in the docroot.
 2. He uploads the new files. Files are mode 644, folders are mode 755. Never 777. Transfer binary (or Auto with no line-ending rewrite). `.htaccess`, once edited, stays 644.
 3. He edits the live `.htaccess` in place, as the last upload step. Merge the template line by line. Do not replace the live file.
-4. Then he runs `scripts/post-merge-curl.sh` (phase 1, the default). After launch he runs `scripts/post-merge-curl.sh https://zumproductions.com 2`. The script prints PASS or FAIL per check and exits 1 on any mismatch. Add `--check-http` only from another network; that flag checks the plain-`http` to `https` redirect.
+4. Then he runs `scripts/post-merge-curl.sh` (phase 1, the default). After launch he runs `scripts/post-merge-curl.sh https://zumproductions.com 2`. Against a local static server, `scripts/post-merge-curl.sh http://127.0.0.1:8000 local` checks the logo, favicon, and OG URLs (200 and content type) without the Apache redirects. The script prints PASS or FAIL per check and exits 1 on any mismatch. Add `--check-http` only from another network; that flag checks the plain-`http` to `https` redirect.
 
 ### What to upload, in two phases
 
-**Pre-launch:** `games/`, `assets/games/`, `css/`, `js/`, plus six shared files that are not on the live site today: `assets/favicon.png`, `assets/logo-mark.png`, `assets/logo-mark.svg`, `assets/logo-wordmark.svg`, `assets/fonts/` (`inter-latin.woff2`), and `assets/og-image.png`.
+**Pre-launch:** `games/` (including the games favicons), `assets/games/`, `assets/brand/`, `css/`, `js/`, `assets/fonts/` (`inter-latin.woff2`), `assets/og-image.png`, and `assets/og-games.png`.
 
 ```bash
-git archive --format=zip -o /tmp/zumproductions-prelaunch.zip HEAD css js games assets/games assets/favicon.png assets/logo-mark.png assets/logo-mark.svg assets/logo-wordmark.svg assets/fonts assets/og-image.png
+git archive --format=zip -o /tmp/zumproductions-prelaunch.zip HEAD css js games assets/games assets/brand assets/fonts assets/og-image.png assets/og-games.png
 ```
 
-Until launch, the `/favicon.ico` link on the new pages serves the old live icon. That is expected. The new `favicon.ico` is uploaded at launch.
+Until launch, a request for `/favicon.ico` still returns the old live icon. Games pages do not use that URL. They point at `/games/favicon.svg`, which is uploaded with `games/`.
 
-**Launch only:** `index.html`, `privacy.html`, `terms.html`, `404.html`, `favicon.ico`, `css/`, `js/`, the rest of `assets/`, and `robots.txt`. `404.html` loads `/css/styles.css` and `/js/nav.js`, so those two directories are in this zip as well. The launch upload is self-contained, and it expects the pre-launch upload to be done already. `robots.txt` allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line. `favicon.ico` is a 16, 32 and 48 pixel file made from `assets/favicon.png`, for the launch swap of the old icon. `404.html` is not wired up until the catch-all is replaced.
+**Launch only:** `index.html`, `privacy.html`, `terms.html`, `404.html`, the studio favicon set (`favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`), `css/`, `js/`, the rest of `assets/`, and `robots.txt`. `404.html` loads `/css/styles.css` and `/js/nav.js`, so those two directories are in this zip as well. The launch upload is self-contained, and it expects the pre-launch upload to be done already. `robots.txt` allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line. `favicon.ico` is the approved 16, 32 and 48 pixel icon, for the launch swap of the old icon. `404.html` is not wired up until the catch-all is replaced.
 
 ```bash
-git archive --format=zip -o /tmp/zumproductions-launch.zip HEAD index.html privacy.html terms.html 404.html favicon.ico css js assets robots.txt
+git archive --format=zip -o /tmp/zumproductions-launch.zip HEAD index.html privacy.html terms.html 404.html favicon.ico favicon.svg favicon-32.png favicon-16.png apple-touch-icon-180.png css js assets robots.txt
 ```
 
 Do not upload README, CHANGELOG, `scripts/`, `.git/`, or other dotfiles. `scripts/` and `.gitkeep` are `export-ignore` in `.gitattributes`, so these zips contain no dotfiles. Run the archive on `main` after the merge and record the SHA.
@@ -106,7 +125,7 @@ After the pre-launch upload, the only games-page links that still miss are `inde
 ### Rollback
 
 1. Re-upload the saved live `.htaccess` first. That is the only file that changes how existing URLs behave. `/games/` can be reached directly, but it is noindexed and not linked from the live site. Restoring the saved file removes the privacy redirect and the `X-Robots-Tag` header. The pages keep their meta noindex.
-2. If that is not enough, delete only files that were new: `games/`, the six added asset files or `assets/` if the rest was uploaded, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, and `terms.html`. For any launch file that replaces an existing live file, restore it from the backup instead of deleting it: `favicon.ico`, `robots.txt`, and `404.html` if one exists live. Do not delete `robots.txt` and leave the site without one.
+2. If that is not enough, delete only files that were new: `games/`, `assets/brand/`, `assets/og-image.png`, `assets/og-games.png`, `assets/fonts/`, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, and `terms.html`. For any launch file that replaces an existing live file, restore it from the backup instead of deleting it: `favicon.ico`, `robots.txt`, and `404.html` if one exists live. Also remove the other studio favicon files if they were uploaded (`favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`). Do not delete `robots.txt` and leave the site without one.
 3. Last resort: restore from Infomaniak's automatic backups (Manager, Backups). Check the retention shown there before relying on it.
 
 ### Launch-day checklist
@@ -115,7 +134,7 @@ Do not do these until Gil says the section goes live.
 
 (b) Remove the live `/` to `/en/` rule. It hides the new `index.html`. The commented `^en(/.*)?$` rule in `.htaccess` can then 301 `/en/` and `/en/*` to `/`. Do not enable that rule while `/` still redirects to `/en/`.
 
-(c) Upload this repo's `robots.txt` over the live one. The live file disallows `/assets/`, which blocks the new images, fonts, and OG image. Also upload `favicon.ico` from the repo root over the old icon.
+(c) Upload this repo's `robots.txt` over the live one. The live file disallows `/assets/`, which blocks the new images, fonts, and OG image. Also upload the studio favicon set from the repo root (`favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`) over the old icon.
 
 (d) `ErrorDocument 404 /404.html` does nothing until the live soft-404 catch-all (the `!-f`/`!-d` rule that 301s to `/404/`) is replaced. `404.html` is in the repo and uses root-absolute paths only. The `ErrorDocument` line in `.htaccess` is commented and sits outside `<IfModule mod_rewrite.c>`, because it is a core directive. Do not enable it beside the old catch-all.
 
