@@ -1,0 +1,3 @@
+.gitkeep export-ignore
+scripts/** export-ignore
+/scripts export-ignore
