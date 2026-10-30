@@ -24,6 +24,7 @@
 ### Changed
 
 - Header and footer use the approved Zum Productions lockup on studio pages and the Zum Games lockup on `/games/` pages. Light SVGs sit on the white header. Dark SVGs sit on the ink footer. The previous wordmark and mark files are removed.
+- The Zum Games logo in the games header and footer links to the games index. The footer logo fades on hover and keyboard focus, with no underline and the lavender focus ring. The 404 page has Open Graph title, type, and URL, and its footer includes Games. Privacy and terms include `og:site_name`. The local note in `scripts/post-merge-curl.sh` lists only the checks that phase runs.
 - Studio favicons are the root set (`favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`). Games pages use the set in `games/`.
 - Open Graph cards are 1200×630 on paper `#F8F6F3`. Studio pages use `assets/og-image.png`. The games index and the games privacy page use `assets/og-games.png`. Each game page still shares its feature graphic.
 - `scripts/post-merge-curl.sh` checks the new logo, favicon, and OG URLs for status 200 and content type. Phase `local` runs those checks against a static server.

@@ -85,13 +85,6 @@
 #   /assets/logo-mark.svg /assets/logo-mark.png /assets/favicon.png
 #                              404
 #   Dotfile and redirect checks are skipped. Those need Apache.
-#   /robots.txt                200, and the body has no "Disallow: /assets/"
-#   /sitemap.xml               404 (real status; there is still no sitemap)
-#   /no-such-page-pr3-check    404 (real status) once ErrorDocument 404 /404.html
-#                              replaces the soft-404 catch-all
-#   /.git/ /.env /.htaccess    403 or 404, never 200
-#   HSTS still present
-#   no 500
 
 set -u
 
@@ -122,7 +115,7 @@ if [[ ${#POSITIONAL[@]} -ge 2 ]]; then
   PHASE_ARG="${POSITIONAL[1]}"
 fi
 if [[ ${#POSITIONAL[@]} -gt 2 ]]; then
-  echo "Too many arguments. Usage: $0 [base-url] [1|2] [--check-http]" >&2
+  echo "Too many arguments. Usage: $0 [base-url] [1|2|local] [--check-http]" >&2
   exit 2
 fi
 

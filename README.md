@@ -66,7 +66,7 @@ Support on each game page is games@zumproductions.com. The privacy contact on th
 
 ## Design
 
-Ink `#0B1F2A`, purple `#6D28D9` (hover `#5B21B6`), background `#F8F6F3`. `#8B5CF6` is decorative only. Inter is self-hosted in `assets/fonts/` so the page does not call Google Fonts. The stack falls back to system UI fonts if the file does not load.
+Ink `#0B1F2A`, purple `#6D28D9` (hover `#5B21B6`), lavender `#C4B5FD`, paper `#F8F6F3`. `#8B5CF6` is decorative only. Inter is self-hosted in `assets/fonts/` so the page does not call Google Fonts. The stack falls back to system UI fonts if the file does not load.
 
 Public contact is `hello@zumproductions.com` for the studio (`bonjour@zumproductions.com` on French content). `games@zumproductions.com` covers games. `privacy@zumproductions.com` stays on the studio privacy notice, the terms questions line, and the games privacy policy.
 
