@@ -9,7 +9,7 @@
 #
 # The base URL is $1, defaulting to https://zumproductions.com.
 # PHASE is 1, 2, or local, from $2 or from the PHASE environment variable. Default is 1.
-# local checks the static files against python3 -m http.server (no Apache redirects).
+# local checks the static files against python3 -m http.server 8000 --bind 127.0.0.1 (no Apache redirects).
 # --check-http (or CHECK_HTTP=1) requests http://<host>/games/ and expects a
 # Location that starts with https://. Leave it off on this network: the proxy
 # here answers 500 on port 80, so that check has to run from somewhere else.
@@ -77,8 +77,10 @@
 #   brand SVGs and both OG images
 #                              200, no X-Robots-Tag, same types as phase 1
 #
-# local, against python3 -m http.server from the repo root:
+# local, against python3 -m http.server 8000 --bind 127.0.0.1 from the repo root:
 #   studio and games HTML      200, no X-Robots-Tag
+#   /css/styles.css            200, text/css, no X-Robots-Tag
+#   /js/nav.js                 200, javascript, no X-Robots-Tag
 #   the logo, favicon, and OG URLs above
 #                              200 and the same content types
 #   /assets/logo-wordmark.svg /assets/logo-wordmark.png
@@ -87,6 +89,7 @@
 #   Dotfile and redirect checks are skipped. Those need Apache.
 
 set -u
+set -o pipefail
 
 BASE=""
 PHASE_ARG=""
@@ -134,6 +137,18 @@ esac
 if [[ "$PHASE" != "1" && "$PHASE" != "2" && "$PHASE" != "local" ]]; then
   echo "PHASE must be 1, 2, or local (got ${PHASE})." >&2
   exit 2
+fi
+
+if [[ "$PHASE" == "local" ]]; then
+  local_host="${BASE,,}"
+  local_host="${local_host#*://}"
+  local_host="${local_host%%/*}"
+  local_host="${local_host##*@}"
+  local_host="${local_host%%:*}"
+  if [[ "$local_host" != "127.0.0.1" && "$local_host" != "localhost" ]]; then
+    echo "local phase refused: host must be 127.0.0.1 or localhost (got ${local_host:-<none>})." >&2
+    exit 1
+  fi
 fi
 
 failures=0

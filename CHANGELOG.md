@@ -23,6 +23,7 @@
 
 ### Changed
 
+- Inter's SIL Open Font License ships as `assets/fonts/OFL.txt` beside the self-hosted font. The 404 page includes `og:site_name`. Footer logo hover and keyboard focus fade the image only; the link keeps the 2px lavender focus ring. Lavender is the `--lavender` custom property (`#C4B5FD`). `.gitattributes` export-ignores `.gitignore`, `.gitattributes`, `README.md`, `CHANGELOG.md`, and `scripts/`. The local phase of `scripts/post-merge-curl.sh` documents `python3 -m http.server 8000 --bind 127.0.0.1` and the css/js checks, sets `pipefail`, and refuses a base URL whose host is not `127.0.0.1` or `localhost`.
 - Header and footer use the approved Zum Productions lockup on studio pages and the Zum Games lockup on `/games/` pages. Light SVGs sit on the white header. Dark SVGs sit on the ink footer. The previous wordmark and mark files are removed.
 - The Zum Games logo in the games header and footer links to the games index. The footer logo fades on hover and keyboard focus, with no underline and the lavender focus ring. The 404 page has Open Graph title, type, and URL, and its footer includes Games. Privacy and terms include `og:site_name`. The local note in `scripts/post-merge-curl.sh` lists only the checks that phase runs.
 - Studio favicons are the root set (`favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`). Games pages use the set in `games/`.
