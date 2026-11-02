@@ -479,6 +479,16 @@ a:hover {
   text-decoration-color: var(--purple-soft);
 }
 
+.site-footer address {
+  font-style: normal;
+}
+
+.prose address {
+  margin: 0.85rem 0 0;
+  color: var(--text-sec);
+  font-style: normal;
+}
+
 .subpage {
   padding: 4.5rem 0 5.5rem;
 }

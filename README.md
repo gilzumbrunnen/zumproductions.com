@@ -68,7 +68,7 @@ Support on each game page is games@zumproductions.com. The privacy contact on th
 
 Ink `#0B1F2A`, purple `#6D28D9` (hover `#5B21B6`), lavender `#C4B5FD`, paper `#F8F6F3`. `#8B5CF6` is decorative only. Inter is self-hosted in `assets/fonts/` so the page does not call Google Fonts. The stack falls back to system UI fonts if the file does not load.
 
-Public contact is `hello@zumproductions.com` for the studio (`bonjour@zumproductions.com` on French content). `games@zumproductions.com` covers games. `privacy@zumproductions.com` stays on the studio privacy notice, the terms questions line, and the games privacy policy.
+Public contact is `hello@zumproductions.com` for the studio (`bonjour@zumproductions.com` on French content), including the terms questions line. `games@zumproductions.com` covers games, and the studio privacy notice names it for game-related enquiries. `privacy@zumproductions.com` stays on the studio privacy notice and the games privacy policy.
 
 ## Logos
 
@@ -138,7 +138,7 @@ Do not do these until Gil says the section goes live.
 
 (d) `ErrorDocument 404 /404.html` does nothing until the live soft-404 catch-all (the `!-f`/`!-d` rule that 301s to `/404/`) is replaced. `404.html` is in the repo and uses root-absolute paths only. The `ErrorDocument` line in `.htaccess` is commented and sits outside `<IfModule mod_rewrite.c>`, because it is a core directive. Do not enable it beside the old catch-all.
 
-(e) Remove the games `noindex` meta tags and the `X-Robots-Tag` block, and set the privacy effective date. Removing the meta tags is a new commit, then re-upload the eight games HTML files:
+(e) Remove the games `noindex` meta tags and the `X-Robots-Tag` block. The games privacy effective date is already 2 November 2026. Removing the meta tags is a new commit, then re-upload the eight games HTML files:
 
 ```bash
 git archive --format=zip -o /tmp/zumproductions-games-html.zip HEAD games/index.html games/privacy/index.html games/fromage-dash/index.html games/callout-cadence/index.html games/alp-graze/index.html games/summit-rescue/index.html games/funicular-fix/index.html games/fondue-frenzy/index.html
@@ -152,6 +152,6 @@ When the commented hardening block is merged, its rewrite rules go before the li
 
 (g) Devops must confirm the document root (Infomaniak Manager, Hosting, Sites) before Gil merges `.htaccess` into the live file. Gil does the upload.
 
-(h) Set the `privacy.html` effective date at publish. The games@ mailbox must exist before merge (or switch the games pages and the games policy to privacy@).
+(h) The `privacy.html` effective date is 2 November 2026. The games@ mailbox must exist before merge (or switch the games pages and the games policy to privacy@).
 
 After the new 404 works, and only then, remove the Gatsby leftovers: `/en/`, `/404/`, `/404.html`, `/static/`, `/page-data/`, and the root Gatsby bundles. `/404/` loads files from `/static/`, so deleting `/static/` first breaks the old 404. `favicon.ico` from this repo replaces the old icon in the same pass. There is no service worker, so no kill-switch file is needed.
