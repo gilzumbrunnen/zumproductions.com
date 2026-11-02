@@ -57,10 +57,10 @@ The games hero files live in `assets/games/hero/` and keep these names: `games_h
 The policy visitors read is the article between `POLICY:START` and `POLICY:END` in `games/privacy/index.html`. To swap in a new approved markdown file:
 
 ```bash
-python3 scripts/render-games-privacy.py path/to/zum-games-privacy-policy-en.md
+python3 scripts/render-games-privacy.py scripts/zum-games-privacy-policy-en.md
 ```
 
-The script removes HTML comments, keeps the wording, and gives each bold game name in the list an anchor (`#fromage-dash` and the rest). Adding a game is one new bullet in that markdown, or one `<li id="slug">` if you edit the HTML, plus a privacy link on that game's page.
+The script removes HTML comments, keeps the wording, and gives each bold game name in the list an anchor (`#fromage-dash` and the rest). Adding a game is one new bullet in that markdown, or one `<li id="slug">` if you edit the HTML, plus a privacy link on that game's page. The checked-in source has the effective date 2 November 2026 as plain text. Its Who we are address starts with `Gil Zumbrunnen (Zum Productions), sole proprietorship` and includes hello@. privacy@ stays the privacy contact. games@ stays in the games footer, outside the rendered article.
 
 Support on each game page is games@zumproductions.com. The privacy contact on the games policy stays privacy@zumproductions.com.
 

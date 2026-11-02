@@ -9,9 +9,14 @@ game name becomes one line:
 
 Usage, from the repo root:
 
-    python3 scripts/render-games-privacy.py path/to/zum-games-privacy-policy-en.md
+    python3 scripts/render-games-privacy.py scripts/zum-games-privacy-policy-en.md
 
 Exits non-zero when the article text does not match the markdown wording.
+The effective date in that source is 2 November 2026, written as plain text.
+A block whose first line is the imprint identity line is an <address>.
+privacy@ and hello@ become mailto links. games@ is the games footer mail
+and sits outside the rendered article, so this script does not rewrite it.
+A leftover "[DD Month YYYY]" placeholder is still marked unset.
 """
 
 from __future__ import annotations
@@ -27,7 +32,11 @@ PAGE = ROOT / "games" / "privacy" / "index.html"
 START = "<!-- POLICY:START -->"
 END = "<!-- POLICY:END -->"
 EMAIL = "privacy@zumproductions.com"
-DATE = "[DD Month YYYY]"
+HELLO = "hello@zumproductions.com"
+GAMES = "games@zumproductions.com"
+DATE = "2 November 2026"
+UNSET_DATE = "[DD Month YYYY]"
+IMPRINT_LINE = "Gil Zumbrunnen (Zum Productions), sole proprietorship"
 
 
 def slug(name: str) -> str:
@@ -42,18 +51,16 @@ def inline(text: str) -> str:
     )
     text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
     text = re.sub(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", r"<em>\1</em>", text)
-    text = text.replace(
-        EMAIL,
-        f'<a href="mailto:{EMAIL}">{EMAIL}</a>',
-    )
+    for address in (EMAIL, HELLO, GAMES):
+        text = text.replace(address, f'<a href="mailto:{address}">{address}</a>')
     text = text.replace(
         "https://policies.google.com/privacy",
         '<a href="https://policies.google.com/privacy">https://policies.google.com/privacy</a>',
     )
     text = text.replace(
-        DATE,
+        UNSET_DATE,
         '<mark class="policy-date" title="Unset. Replace this on the day the policy is approved for publishing.">'
-        f"{DATE}</mark>",
+        f"{UNSET_DATE}</mark>",
     )
     return text
 
@@ -98,6 +105,10 @@ def render_article(markdown: str) -> str:
                 else:
                     items.append(f"    <li>{inline(raw)}</li>")
             parts.append("  <ul>\n" + "\n".join(items) + "\n  </ul>")
+            continue
+        if block[0].strip() == IMPRINT_LINE:
+            body = "<br>\n    ".join(inline(line.strip()) for line in block)
+            parts.append(f"  <address>\n    {body}\n  </address>")
             continue
         body = "<br>\n  ".join(inline(line.strip()) for line in block)
         parts.append(f"  <p>{body}</p>")
@@ -164,6 +175,11 @@ def main() -> None:
     diff = wording_diff(markdown, article)
     if diff:
         raise SystemExit(diff)
+    if DATE not in article or IMPRINT_LINE not in article:
+        raise SystemExit(
+            "Rendered policy is missing the effective date "
+            f"{DATE} or the imprint line."
+        )
     page = PAGE.read_text(encoding="utf-8")
     PAGE.write_text(replace_region(page, article), encoding="utf-8")
     names = re.findall(r'<li id="([^"]+)">', article)
