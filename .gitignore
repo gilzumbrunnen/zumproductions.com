@@ -9,3 +9,12 @@ Desktop.ini
 *~
 .idea/
 .vscode/
+.vscode/sftp.json
+.env*
+*.log
+*.bak
+.htpasswd
+sftp-config.json
+.ftpconfig
+*.filezilla*
+node_modules/

@@ -1,0 +1,4 @@
+# LAUNCH-ONLY. Do not upload this file before launch.
+# There is no sitemap in this repo, so there is no Sitemap line.
+User-agent: *
+Disallow:

@@ -1,0 +1,140 @@
+# NEVER upload this file over the live document-root .htaccess.
+# Reconcile it line by line with the live file first (SFTP port 22 or the
+# Infomaniak file manager). The live file is not in git. This copy is a
+# merge template, built from rules inferred over HTTPS on 2026-10-29.
+#
+# In .htaccess, mod_rewrite runs before mod_alias, so a mod_alias redirect
+# would lose to the live !-f/!-d catch-all that 301s to /404/. The privacy
+# redirect below is a RewriteRule and must sit before that catch-all.
+
+# # # [ADD ONLY IF ALLOWED] the live site already has -Indexes. If the host disallows Options overrides this 500s the whole site.
+# Options -Indexes
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # # # [KEEP LIVE VERSION] HTTPS and www -> apex. Observed: www 301s to the apex with the path kept.
+  # # # If live does this in the Infomaniak panel rather than here, do not add these lines.
+  # RewriteCond %{HTTP_HOST} ^www\.zumproductions\.com$ [NC]
+  # RewriteRule ^ https://zumproductions.com%{REQUEST_URI} [R=301,L]
+
+  # # # NEW (PR #3): exact path only, absolute https target. Must come before the 404 catch-all.
+  # # # A relative target would take the request scheme and host, which can be http behind a TLS proxy.
+  RewriteRule ^games/privacy$ https://zumproductions.com/games/privacy/ [R=301,L]
+
+  # # # [LIVE, old Gatsby site] "/" -> "/en/" (query kept). DELETE AT LAUNCH.
+  # RewriteRule ^$ /en/ [R=301,L]
+
+  # # # [LAUNCH ONLY, do not enable yet] After / no longer redirects to /en/, send the old Gatsby URLs home.
+  # # # Must sit before the 404 catch-all. Do not turn this on while ^$ still goes to /en/.
+  # RewriteRule ^en(/.*)?$ https://zumproductions.com/ [R=301,L]
+
+  # # # [KEEP LIVE VERSION] Catch-all. Observed: 301 to /404/ for missing files and dirs only.
+  # # # Inferred shape. Keep the real live rule, and keep it after the privacy redirect.
+  # RewriteCond %{REQUEST_FILENAME} !-f
+  # RewriteCond %{REQUEST_FILENAME} !-d
+  # RewriteRule ^ /404/ [R=301,L]
+</IfModule>
+
+# # # [LAUNCH ONLY, do not enable yet] Replace that catch-all (do not leave both on).
+# # # ErrorDocument is a core directive, so it stays outside <IfModule mod_rewrite.c>.
+# ErrorDocument 404 /404.html
+
+# NEW (PR #3): temporary noindex for the unpublished games section. Remove at launch.
+<IfModule mod_headers.c>
+  <IfModule mod_setenvif.c>
+    SetEnvIf Request_URI "^/games(/|$)" zum_games_unpublished
+    SetEnvIf Request_URI "^/assets/games(/|$)" zum_games_unpublished
+    Header set X-Robots-Tag "noindex" env=zum_games_unpublished
+  </IfModule>
+</IfModule>
+
+# # # [KEEP LIVE VERSION] Anything else in the live file: HSTS (max-age=16000000) if set here,
+# # # rules that deny .git/.env, AddType/Expires, password protection, and so on.
+
+# # # [OPTIONAL, not active] The live host sends no Cache-Control. Unversioned css and js can stay cached after a later edit.
+# # <FilesMatch "\.(html|css|js)$">
+# #   Header set Cache-Control "no-cache"
+# # </FilesMatch>
+
+# [LAUNCH HARDENING: Devops applies one line at a time, after merging with the live file]
+# Put this block's rewrite rules before the live catch-all. Replace the live
+# Strict-Transport-Security line instead of adding a second one: the later line wins.
+# Nothing in this block is active. Options and ServerSignature can 500 the site if the
+# host disallows those overrides. Drop zip/gz (and the other archive types) from the deny
+# list if the live docroot has real downloads. Do not duplicate headers the Infomaniak
+# panel already sets. The games CSP hash is sha256-WZRJfWvsnNCPcxzZwvyhovnZGqhZaC+8gPGPRbx6wTk=
+# for the inline script document.documentElement.classList.add("js"); redo the hash if that
+# snippet changes by even one byte.
+#
+# # # ===== Security additions (proposed, review 2026-10-29) =====
+# # # Merge into the live docroot .htaccess. Do not upload over it.
+# #
+# # # Directory listings: the live site reportedly already has this. Add only if Options overrides are allowed (otherwise 500).
+# # Options -Indexes
+# #
+# # # Allowed in .htaccess with AllowOverride All. Remove if it causes a 500.
+# # ServerSignature Off
+# #
+# # <IfModule mod_rewrite.c>
+# #   # Drop this RewriteEngine On when uncommenting. The live file already turns rewrite on.
+# #   RewriteEngine On
+# #
+# #   # --- HTTPS + apex in one hop. [KEEP LIVE VERSION] if live/panel already does this.
+# #   # Infomaniak FAQ 1961: %{HTTPS}; if that loops (TLS ended upstream), it uses X-Forwarded-Proto.
+# #   # Redirect only when neither says https. A forged X-Forwarded-Proto: https on plain
+# #   # http only skips the redirect for that client's own request; HSTS covers returning visitors.
+# #   RewriteCond %{HTTPS} !=on
+# #   RewriteCond %{HTTP:X-Forwarded-Proto} !=https [NC]
+# #   RewriteRule ^ https://zumproductions.com%{REQUEST_URI} [R=301,L,NE]
+# #   RewriteCond %{HTTP_HOST} ^www\.zumproductions\.com$ [NC]
+# #   RewriteRule ^ https://zumproductions.com%{REQUEST_URI} [R=301,L,NE]
+# #
+# #   # --- Deny dotfiles and dot-directories (.git, .env, .htpasswd, .gitkeep...) except .well-known (ACME/Let's Encrypt).
+# #   # 404 rather than 403, so nothing is revealed. Must come before the /404/ catch-all.
+# #   RewriteRule (^|/)\.(?!well-known(/|$)) - [R=404,L]
+# #
+# #   # --- Deny backup, config, log, source and archive extensions, and editor backups (~).
+# #   # Check the live docroot first: drop zip/gz etc. if real downloads exist.
+# #   RewriteRule \.(bak|backup|old|orig|save|swp|swo|tmp|sql|sqlite|db|log|ini|conf|cfg|env|dist|ya?ml|toml|lock|sh|py|md|psd|zip|tar|t?gz|7z|rar)$ - [R=404,NC,L]
+# #   RewriteRule ~$ - [R=404,L]
+# #
+# #   # Drop this privacy rule when uncommenting. The active rule above is the same redirect.
+# #   # --- NEW (PR #3): exact path, absolute https target. Keep before the 404 catch-all.
+# #   RewriteRule ^games/privacy$ https://zumproductions.com/games/privacy/ [R=301,L]
+# # </IfModule>
+# #
+# # <IfModule mod_setenvif.c>
+# #   # Scope the strict CSP to the static games section only.
+# #   SetEnvIf Request_URI "^/games(/|$)" zum_games_csp
+# # </IfModule>
+# #
+# # <IfModule mod_headers.c>
+# #   # "always" puts headers on 3xx/4xx/5xx too. Check for duplicates with any panel-set header.
+# #   Header always set X-Content-Type-Options "nosniff"
+# #   Header always set Referrer-Policy "strict-origin-when-cross-origin"
+# #   Header always set X-Frame-Options "DENY"
+# #   Header always set Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), browsing-topics=()"
+# #   Header always set Cross-Origin-Opener-Policy "same-origin"
+# #   Header always unset X-Powered-By
+# #   Header unset X-Powered-By
+# #
+# #   # HSTS: live value is max-age=16000000. Raise to one year.
+# #   # includeSubDomains: Gil to decide (every subdomain must serve valid HTTPS first).
+# #   # NO preload without Gil's explicit OK.
+# #   # If HSTS is set in the Infomaniak Manager, change it there instead of adding this line.
+# #   Header always set Strict-Transport-Security "max-age=31536000"
+# #
+# #   # Site-wide CSP that is safe for the 2021 Gatsby site (no script/style restrictions):
+# #   Header always set Content-Security-Policy "frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+# #
+# #   # Strict CSP for /games/ only (replaces the site-wide header on these URLs).
+# #   # The hash is the inline <script>document.documentElement.classList.add("js");</script>.
+# #   # Any byte change to that snippet needs a new hash.
+# #   Header always set Content-Security-Policy "default-src 'none'; script-src 'self' 'sha256-WZRJfWvsnNCPcxzZwvyhovnZGqhZaC+8gPGPRbx6wTk='; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; upgrade-insecure-requests" env=zum_games_csp
+# #
+# #   # Optional: see what a strict policy would break on the Gatsby pages (console only, nothing blocked).
+# #   # Header always set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+# # </IfModule>
+# # # ===== end security additions =====
