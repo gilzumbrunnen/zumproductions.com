@@ -4,6 +4,7 @@
 
 ### Added
 
+- Painter-approved favicon set + `site.webmanifest` at the site root, and default EN/FR Open Graph images under `assets/og/` (`og-default-en.png`, `og-default-fr.png`). Absolute `zumproductions.com` `og:image` on every HTML page; `og:locale` `en_GB` (FR pages would use `fr_CH`).
 - Unpublished Games section: a Games nav item, a homepage teaser, `/games/`, one page per title, and `/games/privacy/`.
 - Games pages send `noindex`. Remove that meta tag when the section is published. This repo has no sitemap; add the games URLs then if one is created.
 - Games privacy policy for all six titles. The in-app URL is `https://zumproductions.com/games/privacy/`. `/games/privacy` without the slash redirects to that URL on the local static server.
@@ -23,6 +24,7 @@
 
 ### Changed
 
+- Studio and games pages share the root favicon/manifest set and the brand default OG image (EN). Legacy `assets/og-image.png` / `assets/og-games.png` stay in the tree; pages no longer reference them. `post-merge-curl.sh` expects the new root icon paths, `/site.webmanifest`, and `/assets/og/og-default-*.png`.
 - Inter's SIL Open Font License ships as `assets/fonts/OFL.txt` beside the self-hosted font. The 404 page includes `og:site_name`. Footer logo hover and keyboard focus fade the image only; the link keeps the 2px lavender focus ring. Lavender is the `--lavender` custom property (`#C4B5FD`). `.gitattributes` export-ignores `.gitignore`, `.gitattributes`, `README.md`, `CHANGELOG.md`, and `scripts/`. The local phase of `scripts/post-merge-curl.sh` documents `python3 -m http.server 8000 --bind 127.0.0.1` and the css/js checks, sets `pipefail`, and refuses a base URL whose host is not `127.0.0.1` or `localhost`.
 - Header and footer use the approved Zum Productions lockup on studio pages and the Zum Games lockup on `/games/` pages. Light SVGs sit on the white header. Dark SVGs sit on the ink footer. The previous wordmark and mark files are removed.
 - The Zum Games logo in the games header and footer links to the games index. The footer logo fades on hover and keyboard focus, with no underline and the lavender focus ring. The 404 page has Open Graph title, type, and URL, and its footer includes Games. Privacy and terms include `og:site_name`. The local note in `scripts/post-merge-curl.sh` lists only the checks that phase runs.

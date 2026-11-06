@@ -27,8 +27,8 @@ Then open [http://localhost:8000/](http://localhost:8000/).
 | `css/styles.css` | Layout and the Painter palette |
 | `js/nav.js` | Mobile menu only |
 | `assets/` | Logos (`assets/brand/`), service icons, Open Graph images, self-hosted Inter |
-| `favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png` | Studio favicons, at the site root |
-| `games/favicon.svg`, `games/favicon-32.png`, `games/favicon-16.png`, `games/apple-touch-icon-180.png` | Games favicons |
+| `favicon.ico`, `favicon.svg`, `favicon-32x32.png`, `favicon-16x16.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`, `site.webmanifest` | Studio favicons + web manifest, at the site root |
+| `games/favicon.svg`, `games/favicon-32.png`, `games/favicon-16.png`, `games/apple-touch-icon-180.png` | Games store/icon pack (HTML pages use the root favicon set) |
 | `assets/games/<slug>/` | Icon, feature graphic, optional title logo, screenshots |
 
 The games pages are not published. They send `noindex`. `.htaccess` in this repo is a merge template, never a file to upload over the live one. It shows where the `/games/privacy` rewrite and the temporary `X-Robots-Tag: noindex` belong. See the deploy notes. Python's static server still adds the slash on its own.
@@ -83,9 +83,13 @@ Approved lockups are in `assets/brand/`. The SVGs are outlined, so do not retype
 
 Clear space is the padding around the image. For the main logo that is the width of the purple full stop, about 16% of the logo height. For the games logo it is half the cap height of GAMES, about 17% of the logo height. On screen the main logo stays at least 120px wide and the games logo at least 100px wide. The header and footer CSS is above those floors (162px and 133px for the main logo, 208px and 160px for games).
 
-Studio pages use the root favicon set: `favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, and `apple-touch-icon-180.png`. Games pages use the set in `games/` (`favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`). There is no web manifest.
+Every HTML page uses the root favicon set: `favicon.ico`, `favicon.svg`, `favicon-32x32.png`, `favicon-16x16.png`, `apple-touch-icon.png`, plus `site.webmanifest` (`theme_color` `#6D28D9`, `background_color` `#F8F6F3`) and the Android chrome PNGs. The older files under `games/` remain for store artwork; pages no longer point at them.
 
-Open Graph images are 1200×630 on paper `#F8F6F3`, with no effects. `assets/og-image.png` is the studio logo. `assets/og-games.png` is the games logo. Each game page still shares its own feature graphic.
+Open Graph / Twitter share images are 1200×630. Default cards live in `assets/og/`:
+- English pages: `https://zumproductions.com/assets/og/og-default-en.png` (tagline Games · SaaS · Websites · IT)
+- French pages: `https://zumproductions.com/assets/og/og-default-fr.png` (tagline Jeux · SaaS · Sites web · IT)
+
+`og:image` is always an absolute `zumproductions.com` URL (never `.ch`). `og:locale` is `en_GB` or `fr_CH`. Legacy files `assets/og-image.png` and `assets/og-games.png` remain in the tree for older deploy notes; pages no longer reference them. Per-game feature graphics stay under `assets/games/` for store listings.
 
 ## Deploy notes / launch blockers
 
@@ -110,10 +114,10 @@ git archive --format=zip -o /tmp/zumproductions-prelaunch.zip HEAD css js games 
 
 Until launch, a request for `/favicon.ico` still returns the old live icon. Games pages do not use that URL. They point at `/games/favicon.svg`, which is uploaded with `games/`.
 
-**Launch only:** `index.html`, `privacy.html`, `terms.html`, `404.html`, the studio favicon set (`favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`), `css/`, `js/`, the rest of `assets/`, and `robots.txt`. `404.html` loads `/css/styles.css` and `/js/nav.js`, so those two directories are in this zip as well. The launch upload is self-contained, and it expects the pre-launch upload to be done already. `robots.txt` allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line. `favicon.ico` is the approved 16, 32 and 48 pixel icon, for the launch swap of the old icon. `404.html` is not wired up until the catch-all is replaced.
+**Launch only:** `index.html`, `privacy.html`, `terms.html`, `404.html`, the studio favicon set (`favicon.ico`, `favicon.svg`, `favicon-32x32.png`, `favicon-16x16.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`, `site.webmanifest`), `css/`, `js/`, the rest of `assets/` (including `assets/og/`), and `robots.txt`. `404.html` loads `/css/styles.css` and `/js/nav.js`, so those two directories are in this zip as well. The launch upload is self-contained, and it expects the pre-launch upload to be done already. `robots.txt` allows all crawlers and does not disallow `/assets/`. There is no sitemap, so it has no `Sitemap:` line. `favicon.ico` is the approved 16, 32 and 48 pixel icon, for the launch swap of the old icon. `404.html` is not wired up until the catch-all is replaced.
 
 ```bash
-git archive --format=zip -o /tmp/zumproductions-launch.zip HEAD index.html privacy.html terms.html 404.html favicon.ico favicon.svg favicon-32.png favicon-16.png apple-touch-icon-180.png css js assets robots.txt
+git archive --format=zip -o /tmp/zumproductions-launch.zip HEAD index.html privacy.html terms.html 404.html favicon.ico favicon.svg favicon-32x32.png favicon-16x16.png apple-touch-icon.png android-chrome-192x192.png android-chrome-512x512.png site.webmanifest css js assets robots.txt
 ```
 
 Do not upload README, CHANGELOG, `scripts/`, `.git/`, or other dotfiles. `scripts/` and `.gitkeep` are `export-ignore` in `.gitattributes`, so these zips contain no dotfiles. Run the archive on `main` after the merge and record the SHA.
@@ -125,7 +129,7 @@ After the pre-launch upload, the only games-page links that still miss are `inde
 ### Rollback
 
 1. Re-upload the saved live `.htaccess` first. That is the only file that changes how existing URLs behave. `/games/` can be reached directly, but it is noindexed and not linked from the live site. Restoring the saved file removes the privacy redirect and the `X-Robots-Tag` header. The pages keep their meta noindex.
-2. If that is not enough, delete only files that were new: `games/`, `assets/brand/`, `assets/og-image.png`, `assets/og-games.png`, `assets/fonts/`, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, and `terms.html`. For any launch file that replaces an existing live file, restore it from the backup instead of deleting it: `favicon.ico`, `robots.txt`, and `404.html` if one exists live. Also remove the other studio favicon files if they were uploaded (`favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`). Do not delete `robots.txt` and leave the site without one.
+2. If that is not enough, delete only files that were new: `games/`, `assets/brand/`, `assets/og-image.png`, `assets/og-games.png`, `assets/fonts/`, `css/`, `js/`, and, if they were uploaded, `index.html`, `privacy.html`, and `terms.html`. For any launch file that replaces an existing live file, restore it from the backup instead of deleting it: `favicon.ico`, `robots.txt`, and `404.html` if one exists live. Also remove the other studio favicon / manifest files if they were uploaded (`favicon.svg`, `favicon-32x32.png`, `favicon-16x16.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`, `site.webmanifest`). Do not delete `robots.txt` and leave the site without one.
 3. Last resort: restore from Infomaniak's automatic backups (Manager, Backups). Check the retention shown there before relying on it.
 
 ### Launch-day checklist
@@ -134,7 +138,7 @@ Do not do these until Gil says the section goes live.
 
 (b) Remove the live `/` to `/en/` rule. It hides the new `index.html`. The commented `^en(/.*)?$` rule in `.htaccess` can then 301 `/en/` and `/en/*` to `/`. Do not enable that rule while `/` still redirects to `/en/`.
 
-(c) Upload this repo's `robots.txt` over the live one. The live file disallows `/assets/`, which blocks the new images, fonts, and OG image. Also upload the studio favicon set from the repo root (`favicon.ico`, `favicon.svg`, `favicon-32.png`, `favicon-16.png`, `apple-touch-icon-180.png`) over the old icon.
+(c) Upload this repo's `robots.txt` over the live one. The live file disallows `/assets/`, which blocks the new images, fonts, and OG image. Also upload the studio favicon set from the repo root (`favicon.ico`, `favicon.svg`, `favicon-32x32.png`, `favicon-16x16.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png`, `site.webmanifest`) over the old icon.
 
 (d) `ErrorDocument 404 /404.html` does nothing until the live soft-404 catch-all (the `!-f`/`!-d` rule that 301s to `/404/`) is replaced. `404.html` is in the repo and uses root-absolute paths only. The `ErrorDocument` line in `.htaccess` is commented and sits outside `<IfModule mod_rewrite.c>`, because it is a core directive. Do not enable it beside the old catch-all.
 

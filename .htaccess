@@ -10,6 +10,11 @@
 # # # [ADD ONLY IF ALLOWED] the live site already has -Indexes. If the host disallows Options overrides this 500s the whole site.
 # Options -Indexes
 DirectoryIndex index.html
+# NEW (favicon/OG): PWA manifest MIME type. Safe if TypesConfig already maps .webmanifest.
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+</IfModule>
+
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
