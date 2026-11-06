@@ -70,11 +70,11 @@
 #                              403
 #   /favicon.ico               200, image/vnd.microsoft.icon or image/x-icon
 #   /favicon.svg               200, image/svg+xml
-#   /favicon-32.png /favicon-16.png /apple-touch-icon-180.png
+#   /favicon-32x32.png /favicon-16x16.png /apple-touch-icon.png /site.webmanifest /assets/og/og-default-en.png
 #                              200, image/png
 #   /games/favicon.svg and the games PNG icons
 #                              200, no X-Robots-Tag, same types as phase 1
-#   brand SVGs and both OG images
+#   brand SVGs, legacy OG images, and /assets/og/og-default-en.png|/og-default-fr.png
 #                              200, no X-Robots-Tag, same types as phase 1
 #
 # local, against python3 -m http.server 8000 --bind 127.0.0.1 from the repo root:
@@ -362,9 +362,15 @@ expect_root_favicons() {
   local robots="$1"
   expect /favicon.ico 200 - "$robots" "image/vnd.microsoft.icon|image/x-icon"
   expect /favicon.svg 200 - "$robots" image/svg+xml
-  expect /favicon-32.png 200 - "$robots" image/png
-  expect /favicon-16.png 200 - "$robots" image/png
-  expect /apple-touch-icon-180.png 200 - "$robots" image/png
+  expect /favicon-32x32.png 200 - "$robots" image/png
+  expect /favicon-16x16.png 200 - "$robots" image/png
+  expect /apple-touch-icon.png 200 - "$robots" image/png
+  expect /android-chrome-192x192.png 200 - "$robots" image/png
+  expect /android-chrome-512x512.png 200 - "$robots" image/png
+  # python3 -m http.server may serve .webmanifest as octet-stream; Apache uses AddType.
+  expect /site.webmanifest 200 - "$robots" "application/manifest+json|application/json|application/octet-stream"
+  expect /assets/og/og-default-en.png 200 - "$robots" image/png
+  expect /assets/og/og-default-fr.png 200 - "$robots" image/png
 }
 
 echo "phase ${PHASE}  ${BASE}"

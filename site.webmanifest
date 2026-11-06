@@ -1,0 +1,21 @@
+{
+  "name": "Zum Productions",
+  "short_name": "Zum",
+  "description": "Games, SaaS, websites & IT \u2014 Zum Productions",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F6F3",
+  "theme_color": "#6D28D9",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
